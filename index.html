@@ -1,0 +1,879 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>Cozystack Fraud Detection Workshop — Step-by-Step Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f7f5f0; --bg2:#efece4; --surface:#fffdf8; --surface2:#f1eee5;
+    --ink:#1c2430; --ink2:#4b5563; --ink3:#6b7280;
+    --line:#ddd6c6; --line2:#c9c0ab;
+    --accent:#0e7a63; --accent-ink:#0a5c4b; --accent-soft:#e2f0ea;
+    --amber:#b45309; --amber-soft:#fdf0dc;
+    --red:#b3362b; --red-soft:#fbe9e6;
+    --blue:#1d5fa8; --blue-soft:#e4eef9;
+    --code-bg:#17202b; --code-ink:#dbe7f3; --code-dim:#8fa6bd;
+    --shadow:0 1px 2px rgba(28,36,48,.06),0 8px 24px -12px rgba(28,36,48,.18);
+    --radius:14px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#10141b; --bg2:#0c0f15; --surface:#171d28; --surface2:#1e2635;
+      --ink:#e8edf4; --ink2:#aeb9c8; --ink3:#8494a9;
+      --line:#2a3446; --line2:#3a4761;
+      --accent:#3ec9a7; --accent-ink:#7fe0c8; --accent-soft:#123129;
+      --amber:#f0b35c; --amber-soft:#33270f;
+      --red:#f08a7d; --red-soft:#3a1d18;
+      --blue:#7db3ec; --blue-soft:#16283f;
+      --code-bg:#0a0e14; --code-ink:#dbe7f3; --code-dim:#7d93ab;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -12px rgba(0,0,0,.6);
+    }
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} *{animation:none!important;transition:none!important} }
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-size:16.5px;line-height:1.62;-webkit-font-smoothing:antialiased}
+  html[lang="ko"] body{font-family:"Gowun Batang","Archivo",serif;font-size:17.5px;line-height:1.75}
+  html[lang="ko"] h1,html[lang="ko"] h2,html[lang="ko"] h3,html[lang="ko"] .route-name,html[lang="ko"] .stat b{font-family:"Gowun Batang",serif;font-weight:700}
+  a{color:var(--accent-ink)}
+  .wrap{max-width:1060px;margin:0 auto;padding:0 20px}
+
+  /* top bar */
+  .topbar{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .topbar-in{display:flex;align-items:center;gap:14px;padding:10px 0}
+  .brand{font-weight:800;letter-spacing:-.01em;font-size:15px;white-space:nowrap}
+  .brand small{display:block;font-weight:500;color:var(--ink3);font-size:11.5px;letter-spacing:.02em}
+  .topnav{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .topnav a.navlink{display:none;color:var(--ink2);text-decoration:none;font-size:13.5px;font-weight:600;padding:8px 10px;border-radius:8px}
+  .topnav a.navlink:hover{background:var(--surface2);color:var(--ink)}
+  @media(min-width:860px){.topnav a.navlink{display:inline-block}}
+  .langtoggle{display:flex;background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px}
+  .langtoggle button{border:0;background:transparent;color:var(--ink2);font:inherit;font-size:13.5px;font-weight:700;padding:7px 14px;border-radius:999px;cursor:pointer;min-height:36px}
+  .langtoggle button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+  html[lang="ko"] .langtoggle button{font-family:"Gowun Batang",serif}
+
+  /* hero */
+  .hero{padding:44px 0 8px}
+  .kicker{font-size:12.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+  html[lang="ko"] .kicker{letter-spacing:.04em}
+  h1{font-size:clamp(30px,5.4vw,46px);line-height:1.12;letter-spacing:-.02em;margin:10px 0 14px;font-weight:800}
+  .lede{font-size:clamp(16.5px,2.4vw,19px);color:var(--ink2);max-width:46em;margin:0 0 20px}
+  .lede strong{color:var(--ink)}
+  .stats{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 6px}
+  .stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 16px;min-width:118px;box-shadow:var(--shadow)}
+  .stat b{display:block;font-size:21px;letter-spacing:-.01em}
+  .stat span{font-size:12.5px;color:var(--ink3);font-weight:600}
+  .srcnote{font-size:13.5px;color:var(--ink3);margin-top:14px}
+  .srcnote a{font-weight:600}
+
+  section{padding:34px 0 6px}
+  h2{font-size:clamp(23px,3.6vw,30px);letter-spacing:-.015em;margin:0 0 6px;font-weight:800;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  h2 .partno{font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;color:var(--accent-ink);background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);padding:3px 10px;border-radius:999px;letter-spacing:.03em}
+  h2 .mins{font-size:13.5px;color:var(--ink3);font-weight:600}
+  .secintro{color:var(--ink2);max-width:48em;margin:4px 0 18px}
+  h3{font-size:19px;margin:26px 0 6px;font-weight:700;letter-spacing:-.01em}
+
+  /* diagram */
+  .diagram{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 14px 10px;box-shadow:var(--shadow);overflow:hidden}
+  .diagram svg{width:100%;height:auto;display:block}
+  .diagram figcaption{font-size:13.5px;color:var(--ink3);padding:8px 6px 6px;border-top:1px dashed var(--line);margin-top:8px}
+  .dbox{fill:var(--surface2);stroke:var(--line2);stroke-width:1.4}
+  .dbox-acc{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.6}
+  .dbox-warn{fill:var(--amber-soft);stroke:var(--amber);stroke-width:1.5}
+  .dbox-bad{fill:var(--red-soft);stroke:var(--red);stroke-width:1.5}
+  .dbox-blue{fill:var(--blue-soft);stroke:var(--blue);stroke-width:1.5}
+  .dt{fill:var(--ink);font-family:"Archivo",sans-serif;font-weight:700}
+  .dts{fill:var(--ink2);font-family:"Archivo",sans-serif}
+  .dlab{fill:var(--ink3);font-family:"IBM Plex Mono",monospace}
+  html[lang="ko"] .dt,html[lang="ko"] .dts{font-family:"Gowun Batang",serif}
+  .arr{stroke:var(--ink3);stroke-width:1.8;fill:none;marker-end:url(#ah)}
+  .arr-acc{stroke:var(--accent);stroke-width:2.2;fill:none;marker-end:url(#ahA)}
+  .arr-dash{stroke:var(--amber);stroke-width:1.8;fill:none;stroke-dasharray:6 5;marker-end:url(#ahW)}
+
+  /* route map */
+  .route{display:grid;grid-template-columns:1fr;gap:10px;margin:8px 0 4px}
+  @media(min-width:760px){.route{grid-template-columns:repeat(5,1fr)}}
+  .route a{display:block;text-decoration:none;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 14px 12px;box-shadow:var(--shadow);position:relative}
+  .route a:hover{border-color:var(--accent)}
+  .route .n{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;color:var(--accent-ink)}
+  .route .route-name{font-weight:700;font-size:15.5px;line-height:1.35;display:block;margin:4px 0 4px}
+  .route .d{font-size:13px;color:var(--ink2);line-height:1.5;display:block}
+  .route .m{font-size:12px;color:var(--ink3);font-weight:700;display:block;margin-top:8px}
+  .route .chev{display:none}
+  @media(min-width:760px){.route a:not(:last-child)::after{content:"›";position:absolute;right:-11px;top:38%;font-size:20px;color:var(--line2);z-index:2}}
+
+  /* steps */
+  .step{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 18px 14px;margin:0 0 14px;box-shadow:var(--shadow)}
+  .step-head{display:flex;gap:12px;align-items:flex-start}
+  .step-num{flex:0 0 auto;width:34px;height:34px;border-radius:50%;background:var(--ink);color:var(--bg);display:flex;align-items:center;justify-content:center;font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:600;margin-top:2px}
+  .step h3{margin:0;font-size:17.5px}
+  .step p{margin:6px 0 10px;color:var(--ink2)}
+  .step p strong,.step li strong{color:var(--ink)}
+  .step ul{margin:6px 0 10px;padding-left:20px;color:var(--ink2)}
+  .step li{margin:3px 0}
+  .where{display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);background:var(--surface2);border:1px solid var(--line);border-radius:6px;padding:2px 8px;margin-left:8px;vertical-align:2px;white-space:nowrap}
+  html[lang="ko"] .where{letter-spacing:0}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.86em;background:var(--surface2);border:1px solid var(--line);border-radius:5px;padding:1px 5px;color:var(--ink)}
+  .codeblock{position:relative;margin:10px 0}
+  .codeblock pre{background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:14px 16px;overflow-x:auto;margin:0;font-size:13.5px;line-height:1.55}
+  .codeblock pre code{background:none;border:0;padding:0;color:inherit;font-size:inherit;white-space:pre}
+  .codeblock .cm{color:var(--code-dim)}
+  .copybtn{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.08);color:#cfe0ef;border:1px solid rgba(255,255,255,.18);font:inherit;font-size:12px;font-weight:600;padding:6px 12px;border-radius:8px;cursor:pointer;min-height:32px}
+  .copybtn:hover{background:rgba(255,255,255,.16)}
+  .expect{display:flex;gap:10px;background:var(--accent-soft);border-radius:10px;padding:11px 14px;margin:10px 0 4px;font-size:15px}
+  .expect .ic{flex:0 0 auto;color:var(--accent-ink);font-weight:800}
+  .expect p{margin:0;color:var(--ink)}
+  .warnbox{display:flex;gap:10px;background:var(--amber-soft);border-radius:10px;padding:11px 14px;margin:10px 0 4px;font-size:15px}
+  .warnbox p{margin:0;color:var(--ink)}
+  details.solution{margin:10px 0 4px;border:1px dashed var(--line2);border-radius:10px;padding:4px 14px}
+  details.solution summary{cursor:pointer;font-weight:700;font-size:14.5px;color:var(--accent-ink);padding:8px 0;min-height:36px}
+  details.solution .codeblock{margin-bottom:12px}
+
+  /* cards */
+  .cards{display:grid;grid-template-columns:1fr;gap:12px;margin:14px 0}
+  @media(min-width:720px){.cards{grid-template-columns:repeat(3,1fr)}}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:var(--shadow)}
+  .card h4{margin:0 0 6px;font-size:16px}
+  .card p{margin:0;color:var(--ink2);font-size:15px}
+  .card .tag{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:11.5px;font-weight:600;color:var(--red);background:var(--red-soft);border-radius:6px;padding:2px 8px;margin-bottom:8px}
+  .card .tag.ok{color:var(--accent-ink);background:var(--accent-soft)}
+
+  table.pieces{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:15px}
+  table.pieces th,table.pieces td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  table.pieces th{background:var(--surface2);font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink2)}
+  html[lang="ko"] table.pieces th{letter-spacing:0}
+  table.pieces tr:last-child td{border-bottom:0}
+  table.pieces td:first-child{font-weight:700;white-space:nowrap}
+  @media(max-width:640px){
+    table.pieces,table.pieces tbody,table.pieces tr,table.pieces td{display:block;width:100%}
+    table.pieces thead{display:none}
+    table.pieces tr{padding:10px 0;border-bottom:1px solid var(--line)}
+    table.pieces tr:last-child{border-bottom:0}
+    table.pieces td{border:0;padding:3px 14px}
+    table.pieces td:first-child{padding-top:6px}
+  }
+  .kbd{font-family:"IBM Plex Mono",monospace;font-size:.85em;background:var(--surface2);border:1px solid var(--line2);border-bottom-width:2px;border-radius:5px;padding:1px 6px}
+  footer{border-top:1px solid var(--line);margin-top:44px;padding:26px 0 46px;color:var(--ink3);font-size:14px}
+  footer a{font-weight:600}
+  .totop{display:inline-block;margin-top:10px;font-weight:700;text-decoration:none}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <div class="brand">Cozystack Fraud Workshop
+      <small data-en="Step-by-step guide" data-ko="단계별 따라하기 가이드">Step-by-step guide</small>
+    </div>
+    <nav class="topnav" aria-label="Parts">
+      <a class="navlink" href="#part0">Part 0</a>
+      <a class="navlink" href="#part1">Part 1</a>
+      <a class="navlink" href="#part2">Part 2</a>
+      <a class="navlink" href="#part3">Part 3</a>
+      <a class="navlink" href="#part4">Part 4</a>
+      <a class="navlink" href="#trouble" data-en="Troubleshooting" data-ko="문제 해결">Troubleshooting</a>
+      <div class="langtoggle" role="group" aria-label="Language">
+        <button type="button" id="btn-en" aria-pressed="true">EN</button>
+        <button type="button" id="btn-ko" aria-pressed="false">한글</button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="kicker" data-en="Aenix · Cozystack Workshop" data-ko="Aenix · Cozystack 워크숍">Aenix · Cozystack Workshop</div>
+    <h1 data-en="Real-time card fraud detection, built step by step" data-ko="실시간 카드 사기 탐지, 단계별로 직접 구축하기">Real-time card fraud detection, built step by step</h1>
+    <p class="lede" data-en="In about two hours you build a working fraud-detection system for card payments on your own private cloud — then run it like a bank runs production: through a traffic spike, a database node failure, and a live server move mid-payment. The legacy switch stays untouched; you build detection around it." data-ko="약 두 시간 동안 나만의 프라이빗 클라우드 위에 카드 결제용 실시간 사기 탐지 시스템을 직접 구축합니다. 그런 다음 은행이 실서비스를 운영하듯 트래픽 급증, 데이터베이스 노드 장애, 결제 도중의 서버 이동까지 겪어 봅니다. 레거시 스위치는 건드리지 않고, 그 주변에 탐지 시스템을 만듭니다.">In about two hours you build a working fraud-detection system for card payments on your own private cloud — then run it like a bank runs production: through a traffic spike, a database node failure, and a live server move mid-payment. The legacy switch stays untouched; you build detection <strong>around</strong> it.</p>
+    <div class="stats">
+      <div class="stat"><b>≈ 2 h</b><span data-en="Total, 5 parts" data-ko="총 소요, 5개 파트">Total, 5 parts</span></div>
+      <div class="stat"><b>20 /s</b><span data-en="Live payments from terminals" data-ko="단말기에서 들어오는 실시간 결제">Live payments from terminals</span></div>
+      <div class="stat"><b>400 ms</b><span data-en="Scorer deadline, else stand-in" data-ko="스코어러 응답 기한, 넘으면 스탠드인">Scorer deadline, else stand-in</span></div>
+      <div class="stat"><b>$5,000</b><span data-en="The old switch's only rule" data-ko="구형 스위치의 유일한 규칙">The old switch's only rule</span></div>
+    </div>
+    <p class="srcnote"><span data-en="A guided walkthrough of the official workshop:" data-ko="공식 워크숍을 따라가기 쉽게 풀어 쓴 가이드입니다:">A guided walkthrough of the official workshop:</span>
+      <a href="https://github.com/aenix-org/cozystack-workshop/blob/master/fraud/README.md" target="_blank" rel="noopener">aenix-org/cozystack-workshop · fraud/README.md</a>
+      <span data-en="— commands and YAML are quoted from it; replace austinNN with your own username everywhere." data-ko="— 명령어와 YAML은 원문에서 가져왔으며, austinNN은 본인 사용자명으로 바꿔 쓰세요.">— commands and YAML are quoted from it; replace <code>austinNN</code> with your own username everywhere.</span></p>
+  </div>
+
+  <!-- ARCHITECTURE DIAGRAM -->
+  <section id="arch" style="padding-top:14px">
+    <h2 data-en="The system at a glance" data-ko="시스템 한눈에 보기">The system at a glance</h2>
+    <p class="secintro" data-en="Every card payment asks one question — approve or decline? The switch used to answer alone. After this workshop, it asks a scorer over Kafka, and every answer is journaled for cases, analytics, and explanations." data-ko="모든 카드 결제는 하나의 질문을 던집니다 — 승인할까, 거절할까? 예전에는 스위치가 혼자 답했습니다. 이 워크숍이 끝나면 스위치는 Kafka를 통해 스코어러에게 묻고, 모든 답변은 케이스·분석·설명용으로 저널에 기록됩니다.">Every card payment asks one question — approve or decline? The switch used to answer alone. After this workshop, it asks a scorer over Kafka, and every answer is journaled for cases, analytics, and explanations.</p>
+    <figure class="diagram" style="margin:0">
+      <svg viewBox="0 0 980 430" role="img" aria-label="Architecture diagram: terminals to switch, Kafka topics, scorer with Redis, journal to cases, PostgreSQL, dashboard and explainer">
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink3)"/></marker>
+          <marker id="ahA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--accent)"/></marker>
+          <marker id="ahW" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--amber)"/></marker>
+        </defs>
+        <!-- terminals -->
+        <rect class="dbox-blue" x="20" y="60" width="150" height="64" rx="10"/>
+        <text class="dt" x="95" y="88" text-anchor="middle" font-size="16" data-en="Terminals" data-ko="카드 단말기">Terminals</text>
+        <text class="dts" x="95" y="108" text-anchor="middle" font-size="12" data-en="shops · 20 payments/s" data-ko="미국 전역 매장 · 초당 20건">shops · 20 payments/s</text>
+        <!-- switch -->
+        <rect class="dbox-warn" x="250" y="48" width="180" height="88" rx="10"/>
+        <text class="dt" x="340" y="80" text-anchor="middle" font-size="16" data-en="Switch (legacy VM)" data-ko="스위치 (레거시 VM)">Switch (legacy VM)</text>
+        <text class="dts" x="340" y="100" text-anchor="middle" font-size="12" data-en="answers the terminals" data-ko="단말기에 최종 답변">answers the terminals</text>
+        <text class="dts" x="340" y="118" text-anchor="middle" font-size="12" data-en="old rule: decline only &gt; $5,000" data-ko="구 규칙: $5,000 초과만 거절">old rule: decline only &gt; $5,000</text>
+        <!-- kafka requests -->
+        <rect class="dbox" x="505" y="30" width="185" height="52" rx="10"/>
+        <text class="dt" x="597" y="52" text-anchor="middle" font-size="14">Kafka</text>
+        <text class="dlab" x="597" y="70" text-anchor="middle" font-size="12">auth.requests</text>
+        <!-- scorer -->
+        <rect class="dbox-acc" x="765" y="30" width="195" height="80" rx="10"/>
+        <text class="dt" x="862" y="60" text-anchor="middle" font-size="16" data-en="Scorer" data-ko="스코어러">Scorer</text>
+        <text class="dts" x="862" y="80" text-anchor="middle" font-size="12" data-en="your Kubernetes · rules + weights" data-ko="내 쿠버네티스 · 규칙 + 가중치">your Kubernetes · rules + weights</text>
+        <text class="dts" x="862" y="97" text-anchor="middle" font-size="12" data-en="answers in ~10 ms" data-ko="약 10ms 안에 답변">answers in ~10 ms</text>
+        <!-- redis -->
+        <rect class="dbox" x="765" y="140" width="195" height="52" rx="10"/>
+        <text class="dt" x="862" y="162" text-anchor="middle" font-size="14">Redis · features</text>
+        <text class="dts" x="862" y="180" text-anchor="middle" font-size="12" data-en="each card's recent activity" data-ko="카드별 최근 활동 기록">each card's recent activity</text>
+        <!-- kafka decisions -->
+        <rect class="dbox" x="505" y="118" width="185" height="52" rx="10"/>
+        <text class="dt" x="597" y="140" text-anchor="middle" font-size="14">Kafka</text>
+        <text class="dlab" x="597" y="158" text-anchor="middle" font-size="12">auth.decisions</text>
+        <!-- stand-in note -->
+        <rect class="dbox-warn" x="250" y="185" width="180" height="58" rx="10"/>
+        <text class="dt" x="340" y="208" text-anchor="middle" font-size="13.5" data-en="Stand-in fallback" data-ko="스탠드인 폴백">Stand-in fallback</text>
+        <text class="dts" x="340" y="227" text-anchor="middle" font-size="12" data-en="no answer in 400 ms → old rule" data-ko="400ms 무응답 → 구 규칙으로 결정">no answer in 400 ms → old rule</text>
+        <!-- journal -->
+        <rect class="dbox" x="505" y="225" width="185" height="52" rx="10"/>
+        <text class="dt" x="597" y="247" text-anchor="middle" font-size="14">Kafka</text>
+        <text class="dlab" x="597" y="265" text-anchor="middle" font-size="12">auth.journal</text>
+        <!-- cases -->
+        <rect class="dbox-acc" x="765" y="225" width="195" height="52" rx="10"/>
+        <text class="dt" x="862" y="247" text-anchor="middle" font-size="14" data-en="Cases service" data-ko="케이스 서비스">Cases service</text>
+        <text class="dts" x="862" y="265" text-anchor="middle" font-size="12" data-en="records every transaction + alert" data-ko="모든 거래와 알림 기록">records every transaction + alert</text>
+        <!-- postgres -->
+        <rect class="dbox" x="505" y="330" width="185" height="56" rx="10"/>
+        <text class="dt" x="597" y="353" text-anchor="middle" font-size="14">PostgreSQL · cases</text>
+        <text class="dts" x="597" y="371" text-anchor="middle" font-size="12" data-en="primary + hot standby" data-ko="프라이머리 + 핫 스탠바이">primary + hot standby</text>
+        <!-- dashboard -->
+        <rect class="dbox-blue" x="250" y="330" width="180" height="56" rx="10"/>
+        <text class="dt" x="340" y="353" text-anchor="middle" font-size="14" data-en="Fraud dashboard" data-ko="사기 대시보드">Fraud dashboard</text>
+        <text class="dts" x="340" y="371" text-anchor="middle" font-size="12" data-en="live rates, declines, lag" data-ko="실시간 비율·거절·지연 표시">live rates, declines, lag</text>
+        <!-- explainer -->
+        <rect class="dbox" x="765" y="330" width="195" height="56" rx="10"/>
+        <text class="dt" x="862" y="353" text-anchor="middle" font-size="14" data-en="Explainer · Qwen2.5 0.5B" data-ko="설명기 · Qwen2.5 0.5B">Explainer · Qwen2.5 0.5B</text>
+        <text class="dts" x="862" y="371" text-anchor="middle" font-size="12" data-en="“why was this blocked?” in plain words" data-ko="“왜 차단됐나”를 쉬운 말로">“why was this blocked?” in plain words</text>
+        <!-- arrows -->
+        <path class="arr" d="M170,92 L244,92"/>
+        <path class="arr-acc" d="M430,66 L499,60"/>
+        <path class="arr-acc" d="M690,58 L759,62"/>
+        <path class="arr" d="M862,110 L862,134"/>
+        <path class="arr-acc" d="M759,132 L696,140"/>
+        <path class="arr-acc" d="M505,146 L436,120"/>
+        <path class="arr-dash" d="M340,136 L340,179"/>
+        <path class="arr" d="M430,214 L470,214 L470,251 L499,251"/>
+        <path class="arr" d="M690,251 L759,251"/>
+        <path class="arr" d="M765,300 L700,330 L696,344"/>
+        <path class="arr" d="M505,358 L436,358"/>
+        <path class="arr-dash" d="M765,358 L700,358" stroke-dasharray="2 4"/>
+        <path class="arr" d="M862,277 L862,324"/>
+      </svg>
+      <figcaption data-en="Solid arrows: the live payment path. Dashed amber: the stand-in fallback and the explainer feed. Kafka, Redis and PostgreSQL are catalog services on the platform; scorer, cases, dashboard and explainer run in your own Kubernetes cluster." data-ko="실선 화살표: 실제 결제 경로. 주황 점선: 스탠드인 폴백과 설명기 연결. Kafka·Redis·PostgreSQL은 플랫폼의 카탈로그 서비스이고, 스코어러·케이스·대시보드·설명기는 내 쿠버네티스 클러스터에서 돕니다.">Solid arrows: the live payment path. Dashed amber: the stand-in fallback and the explainer feed. Kafka, Redis and PostgreSQL are catalog services on the platform; scorer, cases, dashboard and explainer run in your own Kubernetes cluster.</figcaption>
+    </figure>
+
+    <h3 data-en="Who does what" data-ko="구성 요소별 역할">Who does what</h3>
+    <table class="pieces">
+      <thead><tr>
+        <th data-en="Piece" data-ko="구성 요소">Piece</th>
+        <th data-en="Runs where" data-ko="실행 위치">Runs where</th>
+        <th data-en="Job" data-ko="역할">Job</th>
+      </tr></thead>
+      <tbody>
+        <tr><td>Switch</td><td data-en="VM in your tenant" data-ko="내 테넌트 안의 VM">VM in your tenant</td><td data-en="Answers terminals; asks the scorer, or decides alone (stand-in)" data-ko="단말기에 답변; 스코어러에게 묻거나 혼자 결정(스탠드인)">Answers terminals; asks the scorer, or decides alone (stand-in)</td></tr>
+        <tr><td>Kafka</td><td data-en="Catalog service" data-ko="카탈로그 서비스">Catalog service</td><td data-en="Carries every request, decision and journal entry" data-ko="모든 요청·결정·저널 항목을 운반">Carries every request, decision and journal entry</td></tr>
+        <tr><td>Redis</td><td data-en="Catalog service" data-ko="카탈로그 서비스">Catalog service</td><td data-en="Remembers each card's recent activity: how often, where, how much" data-ko="카드별 최근 활동 기억: 빈도·장소·금액">Remembers each card's recent activity: how often, where, how much</td></tr>
+        <tr><td>PostgreSQL</td><td data-en="Catalog service, 2 replicas" data-ko="카탈로그 서비스, 복제본 2개">Catalog service, 2 replicas</td><td data-en="The case database: every transaction and every alert" data-ko="케이스 DB: 모든 거래와 모든 알림">The case database: every transaction and every alert</td></tr>
+        <tr><td data-en="Scorer · Cases · Dashboard" data-ko="스코어러 · 케이스 · 대시보드">Scorer · Cases · Dashboard</td><td data-en="Your Kubernetes cluster" data-ko="내 쿠버네티스 클러스터">Your Kubernetes cluster</td><td data-en="Decide, record, show" data-ko="판정하고, 기록하고, 보여 줌">Decide, record, show</td></tr>
+        <tr><td data-en="Explainer" data-ko="설명기">Explainer</td><td data-en="Your Kubernetes cluster" data-ko="내 쿠버네티스 클러스터">Your Kubernetes cluster</td><td data-en="Qwen2.5 0.5B on CPU writes a plain-language reason for each block" data-ko="CPU에서 도는 Qwen2.5 0.5B가 차단 사유를 쉬운 말로 작성">Qwen2.5 0.5B on CPU writes a plain-language reason for each block</td></tr>
+        <tr><td data-en="Terminals" data-ko="단말기">Terminals</td><td data-en="Your Kubernetes cluster" data-ko="내 쿠버네티스 클러스터">Your Kubernetes cluster</td><td data-en="Shops across the US sending ordinary payments" data-ko="평범한 결제를 보내는 미국 전역의 매장">Shops across the US sending ordinary payments</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ROUTE -->
+  <section id="route">
+    <h2 data-en="The route — 130 minutes" data-ko="전체 경로 — 총 130분">The route — 130 minutes</h2>
+    <p class="secintro" data-en="Five parts, in order. Each part ends in a state you can see — a log line, a dashboard, a recovered service — before the next one starts. Tap a part to jump to it." data-ko="다섯 파트를 순서대로 진행합니다. 각 파트는 로그 한 줄, 대시보드, 복구된 서비스처럼 눈으로 확인할 수 있는 상태로 끝난 뒤 다음으로 넘어갑니다. 파트를 누르면 해당 위치로 이동합니다.">Five parts, in order. Each part ends in a state you can see — a log line, a dashboard, a recovered service — before the next one starts. Tap a part to jump to it.</p>
+    <div class="route">
+      <a href="#part0"><span class="n">PART 0</span><span class="route-name" data-en="Look around" data-ko="둘러보기">Look around</span><span class="d" data-en="Log in, meet your tenant, watch fraud sail through the bare switch." data-ko="로그인하고 테넌트를 확인한 뒤, 맨 스위치를 사기가 그대로 통과하는 모습을 봅니다.">Log in, meet your tenant, watch fraud sail through the bare switch.</span><span class="m">15 min</span></a>
+      <a href="#part1"><span class="n">PART 1</span><span class="route-name" data-en="Order the data services" data-ko="데이터 서비스 주문하기">Order the data services</span><span class="d" data-en="Redis, Kafka, PostgreSQL from the catalog — via GUI, docs, and Git." data-ko="카탈로그에서 Redis·Kafka·PostgreSQL을 GUI, 문서, Git 세 방식으로 주문합니다.">Redis, Kafka, PostgreSQL from the catalog — via GUI, docs, and Git.</span><span class="m">30 min</span></a>
+      <a href="#part2"><span class="n">PART 2</span><span class="route-name" data-en="Fraud scoring" data-ko="사기 스코어링">Fraud scoring</span><span class="d" data-en="Deploy the scorer, wire the switch to it, and stop the same attack." data-ko="스코어러를 배포하고 스위치를 연결한 뒤, 같은 공격을 막아 냅니다.">Deploy the scorer, wire the switch to it, and stop the same attack.</span><span class="m">25 min</span></a>
+      <a href="#part3"><span class="n">PART 3</span><span class="route-name" data-en="Grow with the catalog" data-ko="카탈로그로 확장하기">Grow with the catalog</span><span class="d" data-en="Add ClickHouse analytics and an S3 report bucket — no new code." data-ko="새 코드 없이 ClickHouse 분석과 S3 리포트 버킷을 추가합니다.">Add ClickHouse analytics and an S3 report bucket — no new code.</span><span class="m">30 min</span></a>
+      <a href="#part4"><span class="n">PART 4</span><span class="route-name" data-en="Production day" data-ko="운영의 날">Production day</span><span class="d" data-en="Black Friday scaling, a dead database primary, a live VM migration." data-ko="블랙프라이데이 확장, DB 프라이머리 장애, VM 라이브 마이그레이션.">Black Friday scaling, a dead database primary, a live VM migration.</span><span class="m">30 min</span></a>
+    </div>
+    <div class="warnbox"><p><strong data-en="Before you start: " data-ko="시작 전에: ">Before you start: </strong><span data-en="You get one username (austinNN) and one password for both the bastion and GitLab; they are also in ~/credentials.txt on the bastion. The host pre-built your tenant tenant-austinNN with the switch VM, a Kubernetes cluster named fraud, and terminals already sending 20 payments a second. Your repo austinNN/fraud-infra is cloned at ~/fraud-infra; materials live in ~/workshop." data-ko="사용자명(austinNN)과 비밀번호 하나를 배스천과 GitLab 공용으로 받습니다. 배스천의 ~/credentials.txt에도 있습니다. 호스트가 테넌트 tenant-austinNN에 스위치 VM, fraud라는 쿠버네티스 클러스터, 초당 20건을 보내는 단말기까지 미리 준비해 뒀습니다. 저장소 austinNN/fraud-infra는 ~/fraud-infra에 클론돼 있고, 자료는 ~/workshop에 있습니다.">You get one username (<code>austinNN</code>) and one password for both the bastion and GitLab; they are also in <code>~/credentials.txt</code> on the bastion. The host pre-built your tenant <code>tenant-austinNN</code> with the switch VM, a Kubernetes cluster named <code>fraud</code>, and terminals already sending 20 payments a second. Your repo <code>austinNN/fraud-infra</code> is cloned at <code>~/fraud-infra</code>; materials live in <code>~/workshop</code>.</span></p></div>
+  </section>
+  <!-- PART 0 -->
+  <section id="part0">
+    <h2><span class="partno">PART 0</span> <span data-en="Look around" data-ko="둘러보기">Look around</span> <span class="mins">15 min</span></h2>
+    <p class="secintro" data-en="Goal: know where everything lives — two kubectl contexts, one Git repository — and prove the problem is real before building anything." data-ko="목표: 두 개의 kubectl 컨텍스트와 하나의 Git 저장소, 모든 것이 어디 있는지 파악하고, 만들기 전에 문제가 실제로 존재함을 확인합니다.">Goal: know where everything lives — two kubectl contexts, one Git repository — and prove the problem is real before building anything.</p>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">1</div><div>
+        <h3><span data-en="Log in and find your tenant" data-ko="로그인하고 테넌트 찾기">Log in and find your tenant</span><span class="where" data-en="Laptop → Bastion" data-ko="노트북 → 배스천">Laptop → Bastion</span></h3>
+        <p data-en="SSH into the shared bastion VM and look at the workshop materials. You have two kubectl contexts: tenant talks to Cozystack itself (VM, catalog services, the cluster object); fraud talks to your own Kubernetes cluster, where the detection services will run." data-ko="공유 배스천 VM에 SSH로 접속해 워크숍 자료를 확인합니다. kubectl 컨텍스트는 두 개입니다. tenant는 Cozystack 자체(VM, 카탈로그 서비스, 클러스터 객체)와 통신하고, fraud는 탐지 서비스가 도는 내 쿠버네티스 클러스터와 통신합니다.">SSH into the shared bastion VM and look at the workshop materials. You have two kubectl contexts: <strong>tenant</strong> talks to Cozystack itself (VM, catalog services, the cluster object); <strong>fraud</strong> talks to your own Kubernetes cluster, where the detection services will run.</p>
+      </div></div>
+      <div class="codeblock"><pre><code>ssh austinNN@&lt;bastion-address&gt;
+cd ~/workshop &amp;&amp; ls
+
+kubectl --context tenant get vminstances,kubernetes
+kubectl --context tenant get resourcequota
+kubectl --context tenant get applicationdefinitions
+kubectl --context fraud get nodes
+kubectl --context fraud -n fraud get pods</code></pre></div>
+      <div class="expect"><span class="ic">✓</span><p data-en="The switch VM and cluster fraud are ready, you see your quota (hard = limit, used = consumed), the orderable catalog, one cluster node, and the running terminals pod. A prepull-explainer pod in Completed is expected — the host pre-downloaded the language model. The same objects appear in the Cozystack dashboard under your tenant." data-ko="스위치 VM과 클러스터 fraud가 준비돼 있고, 쿼터(hard = 한도, used = 사용량), 주문 가능한 카탈로그, 클러스터 노드 1개, 실행 중인 terminals 파드가 보입니다. Completed 상태의 prepull-explainer 파드는 정상입니다 — 호스트가 언어 모델을 미리 받아 둔 것입니다. Cozystack 대시보드에서 테넌트를 선택하면 같은 객체들을 볼 수 있습니다.">The switch VM and cluster <code>fraud</code> are ready, you see your quota (<code>hard</code> = limit, <code>used</code> = consumed), the orderable catalog, one cluster node, and the running <code>terminals</code> pod. A <code>prepull-explainer</code> pod in <code>Completed</code> is expected — the host pre-downloaded the language model. The same objects appear in the Cozystack dashboard under your tenant.</p></div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">2</div><div>
+        <h3><span data-en="Your infrastructure is a Git repository" data-ko="인프라가 곧 Git 저장소">Your infrastructure is a Git repository</span><span class="where" data-en="Bastion · GitLab" data-ko="배스천 · GitLab">Bastion · GitLab</span></h3>
+        <p data-en="Everything the platform runs for you is declared in ~/fraud-infra/platform/. Flux applies that folder from the main branch within about a minute of every push, using your tenant rights. Every service you order in this workshop ends up as a file here — Git is the source of truth." data-ko="플랫폼이 대신 실행하는 모든 것은 ~/fraud-infra/platform/에 선언돼 있습니다. Flux는 푸시 후 약 1분 안에 main 브랜치의 이 폴더를 테넌트 권한으로 적용합니다. 이 워크숍에서 주문하는 모든 서비스는 결국 여기 파일이 됩니다 — Git이 진실의 원천입니다.">Everything the platform runs for you is declared in <code>~/fraud-infra/platform/</code>. Flux applies that folder from the <code>main</code> branch within about a minute of every push, using your tenant rights. Every service you order in this workshop ends up as a file here — Git is the source of truth.</p>
+      </div></div>
+      <div class="codeblock"><pre><code>cd ~/fraud-infra &amp;&amp; ls platform &amp;&amp; cat platform/kubernetes.yaml</code></pre></div>
+      <div class="expect"><span class="ic">✓</span><p data-en="kubernetes.yaml (your fraud cluster) and switch-vm.yaml (the legacy switch). Open the same repo in GitLab: gitlab.workshop.aenix.io/austinNN/fraud-infra — same username and password as the bastion." data-ko="kubernetes.yaml(fraud 클러스터 선언)과 switch-vm.yaml(레거시 스위치)이 보입니다. GitLab에서도 같은 저장소를 여세요: gitlab.workshop.aenix.io/austinNN/fraud-infra — 배스천과 같은 계정입니다."><code>kubernetes.yaml</code> (your <code>fraud</code> cluster) and <code>switch-vm.yaml</code> (the legacy switch). Open the same repo in GitLab: <code>gitlab.workshop.aenix.io/austinNN/fraud-infra</code> — same username and password as the bastion.</p></div>
+      <figure class="diagram" style="margin:12px 0 2px">
+        <svg viewBox="0 0 940 150" role="img" aria-label="GitOps loop diagram">
+          <defs><marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink3)"/></marker></defs>
+          <rect class="dbox-blue" x="15" y="45" width="170" height="60" rx="10"/>
+          <text class="dt" x="100" y="72" text-anchor="middle" font-size="15" data-en="You edit YAML" data-ko="YAML 편집">You edit YAML</text>
+          <text class="dts" x="100" y="92" text-anchor="middle" font-size="12">~/fraud-infra/platform/</text>
+          <rect class="dbox" x="265" y="45" width="170" height="60" rx="10"/>
+          <text class="dt" x="350" y="72" text-anchor="middle" font-size="15">git push → main</text>
+          <text class="dts" x="350" y="92" text-anchor="middle" font-size="12" data-en="the only way in" data-ko="유일한 입력 경로">the only way in</text>
+          <rect class="dbox-acc" x="515" y="45" width="170" height="60" rx="10"/>
+          <text class="dt" x="600" y="72" text-anchor="middle" font-size="15">Flux</text>
+          <text class="dts" x="600" y="92" text-anchor="middle" font-size="12" data-en="reconciles in ~1 min" data-ko="약 1분 안에 조정">reconciles in ~1 min</text>
+          <rect class="dbox" x="765" y="45" width="165" height="60" rx="10"/>
+          <text class="dt" x="847" y="72" text-anchor="middle" font-size="15" data-en="Tenant reality" data-ko="테넌트의 실제 상태">Tenant reality</text>
+          <text class="dts" x="847" y="92" text-anchor="middle" font-size="12" data-en="VM · services · cluster" data-ko="VM · 서비스 · 클러스터">VM · services · cluster</text>
+          <path d="M185,75 L259,75" stroke="var(--ink3)" stroke-width="1.8" fill="none" marker-end="url(#ah2)"/>
+          <path d="M435,75 L509,75" stroke="var(--ink3)" stroke-width="1.8" fill="none" marker-end="url(#ah2)"/>
+          <path d="M685,75 L759,75" stroke="var(--ink3)" stroke-width="1.8" fill="none" marker-end="url(#ah2)"/>
+          <path d="M847,105 C847,132 600,132 600,111" stroke="var(--amber)" stroke-width="1.8" fill="none" stroke-dasharray="6 5" marker-end="url(#ah2)"/>
+          <text class="dts" x="724" y="143" text-anchor="middle" font-size="12" data-en="drift? Flux puts it back (step 1.6)" data-ko="드리프트 발생 시 Flux가 되돌림 (1.6단계)">drift? Flux puts it back (step 1.6)</text>
+        </svg>
+        <figcaption data-en="The GitOps loop you will use all day: declare in Git, push, let Flux reconcile. Manual changes that are not in Git do not survive." data-ko="하루 종일 사용할 GitOps 루프입니다. Git에 선언하고 푸시하면 Flux가 조정합니다. Git에 없는 수동 변경은 살아남지 못합니다.">The GitOps loop you will use all day: declare in Git, push, let Flux reconcile. Manual changes that are not in Git do not survive.</figcaption>
+      </figure>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">3</div><div>
+        <h3><span data-en="Watch the bare switch — then attack it" data-ko="맨 스위치 관찰 후 공격해 보기">Watch the bare switch — then attack it</span><span class="where" data-en="Bastion · Switch VM" data-ko="배스천 · 스위치 VM">Bastion · Switch VM</span></h3>
+        <p data-en="Enter the switch VM console (user ubuntu, password ubuntu), follow its log, then leave with Ctrl-]. Back on the bastion, launch the fraud attack against the undefended switch." data-ko="스위치 VM 콘솔에 들어가(사용자 ubuntu, 비밀번호 ubuntu) 로그를 지켜본 뒤 Ctrl-]로 나옵니다. 배스천으로 돌아와 방어 없는 스위치를 향해 사기 공격을 실행합니다.">Enter the switch VM console (user <code>ubuntu</code>, password <code>ubuntu</code>), follow its log, then leave with <span class="kbd">Ctrl-]</span>. Back on the bastion, launch the fraud attack against the undefended switch.</p>
+      </div></div>
+      <div class="codeblock"><pre><code>cd ~/workshop
+virtctl console vm-instance-switch
+<span class="cm"># inside the VM:</span>
+journalctl -u auth-switch -f
+<span class="cm"># Ctrl-C to stop the log, Ctrl-] to leave the console</span>
+
+kubectl --context fraud apply -f manifests/04-attack.yaml
+kubectl --context fraud -n fraud logs job/attack -f</code></pre></div>
+      <div class="expect"><span class="ic">✓</span><p data-en="The log repeats “100 authorizations, 0 declined, stand-in 0.0%, p99 0 ms” — legacy mode declines only amounts above $5,000. The attack log shows card testing, impossible travel and a BIN attack — then “sent 30, approved 30, declined 0”. Every fraudulent payment passes. Remember these cards: in Part 2 the same attack meets your scorer." data-ko="로그에 “100 authorizations, 0 declined, stand-in 0.0%, p99 0 ms”가 반복됩니다 — 레거시 모드는 $5,000 초과만 거절합니다. 공격 로그에는 카드 테스팅, 불가능한 이동, BIN 공격이 찍히고 이어서 “sent 30, approved 30, declined 0”가 나옵니다. 사기 결제가 전부 통과합니다. 이 카드들을 기억하세요. Part 2에서 같은 공격이 스코어러와 맞붙습니다.">The log repeats “100 authorizations, 0 declined, stand-in 0.0%, p99 0 ms” — legacy mode declines only amounts above $5,000. The attack log shows card testing, impossible travel and a BIN attack — then “sent 30, approved 30, declined 0”. <strong>Every fraudulent payment passes.</strong> Remember these cards: in Part 2 the same attack meets your scorer.</p></div>
+    </div>
+  </section>
+
+  <!-- PART 1 -->
+  <section id="part1">
+    <h2><span class="partno">PART 1</span> <span data-en="Order the data services" data-ko="데이터 서비스 주문하기">Order the data services</span> <span class="mins">30 min</span></h2>
+    <p class="secintro" data-en="Three catalog services, ordered three different ways — that contrast is the lesson. Kafka carries requests, decisions and the journal. Redis remembers each card's recent activity. PostgreSQL stores transactions and alerts, with a primary and a hot standby." data-ko="카탈로그 서비스 세 개를 서로 다른 세 가지 방식으로 주문합니다 — 그 대비가 이 파트의 핵심입니다. Kafka는 요청·결정·저널을 운반하고, Redis는 카드별 최근 활동을 기억하며, PostgreSQL은 프라이머리와 핫 스탠바이로 거래와 알림을 저장합니다.">Three catalog services, ordered three different ways — that contrast is the lesson. Kafka carries requests, decisions and the journal. Redis remembers each card's recent activity. PostgreSQL stores transactions and alerts, with a primary and a hot standby.</p>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">1</div><div>
+        <h3><span data-en="Redis: start in the GUI, finish in Git" data-ko="Redis: GUI에서 시작해 Git으로 마무리">Redis: start in the GUI, finish in Git</span><span class="where" data-en="Dashboard · Bastion" data-ko="대시보드 · 배스천">Dashboard · Bastion</span></h3>
+        <p data-en="In the Cozystack dashboard, open your tenant's catalog and create Redis named features: replicas 1, size 1Gi, storage class replicated, authentication off. Then inspect what the GUI created, copy just the declaration fields (apiVersion, kind, metadata.name, the spec fields — never status) into ~/fraud-infra/platform/redis.yaml, and push. From now on Git manages the object the GUI created." data-ko="Cozystack 대시보드에서 테넌트의 카탈로그를 열고 Redis를 만듭니다. 이름 features, 복제본 1, 크기 1Gi, 스토리지 클래스 replicated, 인증 끄기. 그다음 GUI가 만든 객체를 조회해 선언 필드(apiVersion, kind, metadata.name, spec 필드 — status는 제외)만 ~/fraud-infra/platform/redis.yaml로 옮기고 푸시합니다. 이제부터는 GUI가 만든 객체를 Git이 관리합니다.">In the Cozystack dashboard, open your tenant's catalog and create Redis named <code>features</code>: replicas <code>1</code>, size <code>1Gi</code>, storage class <code>replicated</code>, authentication off. Then inspect what the GUI created, copy just the declaration fields (<code>apiVersion</code>, <code>kind</code>, <code>metadata.name</code>, the <code>spec</code> fields — never <code>status</code>) into <code>~/fraud-infra/platform/redis.yaml</code>, and push. From now on Git manages the object the GUI created.</p>
+      </div></div>
+      <div class="codeblock"><pre><code>kubectl --context tenant get redis features -o yaml</code></pre></div>
+      <details class="solution">
+        <summary data-en="Solution — platform/redis.yaml" data-ko="정답 — platform/redis.yaml">Solution — platform/redis.yaml</summary>
+        <div class="codeblock"><pre><code>apiVersion: apps.cozystack.io/v1alpha1
+kind: Redis
+metadata:
+  name: features
+spec:
+  replicas: 1
+  size: 1Gi
+  storageClass: replicated
+  authEnabled: false</code></pre></div>
+        <div class="codeblock"><pre><code>cd ~/fraud-infra
+git add platform/redis.yaml
+git commit -m "Order Redis for card history"
+git push</code></pre></div>
+      </details>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">2</div><div>
+        <h3><span data-en="Kafka: write it from the docs" data-ko="Kafka: 문서를 보고 직접 작성">Kafka: write it from the docs</span><span class="where" data-en="Bastion · Docs" data-ko="배스천 · 문서">Bastion · Docs</span></h3>
+        <p data-en="Using the Cozystack Kafka documentation, write platform/kafka.yaml yourself: one broker, 5Gi on replicated storage, preset c1.small (KRaft mode — no ZooKeeper), and three topics with 8 partitions and 1 replica each. The partition count looks minor now; Part 4 shows it is the ceiling of the whole system." data-ko="Cozystack Kafka 문서를 보고 platform/kafka.yaml을 직접 작성합니다. 브로커 1개, 복제 스토리지에 5Gi, 프리셋 c1.small(KRaft 모드 — ZooKeeper 없음), 그리고 파티션 8개·복제본 1개짜리 토픽 세 개. 파티션 수는 지금은 사소해 보이지만, Part 4에서 시스템 전체의 상한임이 드러납니다.">Using the Cozystack Kafka documentation, write <code>platform/kafka.yaml</code> yourself: one broker, 5Gi on replicated storage, preset <code>c1.small</code> (KRaft mode — no ZooKeeper), and three topics with <strong>8 partitions</strong> and 1 replica each. The partition count looks minor now; Part 4 shows it is the ceiling of the whole system.</p>
+      </div></div>
+      <details class="solution">
+        <summary data-en="Solution — platform/kafka.yaml" data-ko="정답 — platform/kafka.yaml">Solution — platform/kafka.yaml</summary>
+        <div class="codeblock"><pre><code>apiVersion: apps.cozystack.io/v1alpha1
+kind: Kafka
+metadata:
+  name: kafka
+spec:
+  kafka:
+    replicas: 1
+    size: 5Gi
+    storageClass: replicated
+    resourcesPreset: c1.small
+  topics:
+    - {name: auth.requests,  partitions: 8, replicas: 1, config: {}}
+    - {name: auth.decisions, partitions: 8, replicas: 1, config: {}}
+    - {name: auth.journal,   partitions: 8, replicas: 1, config: {}}</code></pre></div>
+      </details>
+      <div class="cards" style="margin-bottom:4px">
+        <div class="card"><span class="tag ok">auth.requests</span><p data-en="The switch's questions to the scorer." data-ko="스위치가 스코어러에게 보내는 질문.">The switch's questions to the scorer.</p></div>
+        <div class="card"><span class="tag ok">auth.decisions</span><p data-en="The scorer's answers back to the switch." data-ko="스코어러가 스위치에게 돌려주는 답변.">The scorer's answers back to the switch.</p></div>
+        <div class="card"><span class="tag ok">auth.journal</span><p data-en="Every answer the switch gave — whoever decided it. The audit trail." data-ko="누가 결정했든 스위치가 낸 모든 답변. 감사 추적 기록.">Every answer the switch gave — whoever decided it. The audit trail.</p></div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">3</div><div>
+        <h3><span data-en="PostgreSQL: a primary and a hot standby" data-ko="PostgreSQL: 프라이머리와 핫 스탠바이">PostgreSQL: a primary and a hot standby</span><span class="where" data-en="Bastion · Docs" data-ko="배스천 · 문서">Bastion · Docs</span></h3>
+        <p data-en="Write platform/postgres.yaml from the PostgreSQL docs: name cases, replicas 2 (that means primary plus one standby), 2Gi each on replicated storage, preset t1.micro, user fraud, database fraud owned by that user. Do not set a password — Cozystack generates it into the Secret postgres-cases-credentials; step 2.1 hands it to your services." data-ko="PostgreSQL 문서를 보고 platform/postgres.yaml을 작성합니다. 이름 cases, 복제본 2(프라이머리 1 + 스탠바이 1이라는 뜻), 각각 복제 스토리지 2Gi, 프리셋 t1.micro, 사용자 fraud, 그 사용자가 소유한 데이터베이스 fraud. 비밀번호는 직접 정하지 않습니다 — Cozystack이 생성해 Secret postgres-cases-credentials에 넣어 두며, 2.1단계에서 서비스에 전달합니다.">Write <code>platform/postgres.yaml</code> from the PostgreSQL docs: name <code>cases</code>, <code>replicas: 2</code> (that means primary <em>plus</em> one standby), 2Gi each on replicated storage, preset <code>t1.micro</code>, user <code>fraud</code>, database <code>fraud</code> owned by that user. Do <strong>not</strong> set a password — Cozystack generates it into the Secret <code>postgres-cases-credentials</code>; step 2.1 hands it to your services.</p>
+      </div></div>
+      <details class="solution">
+        <summary data-en="Solution — platform/postgres.yaml" data-ko="정답 — platform/postgres.yaml">Solution — platform/postgres.yaml</summary>
+        <div class="codeblock"><pre><code>apiVersion: apps.cozystack.io/v1alpha1
+kind: Postgres
+metadata:
+  name: cases
+spec:
+  replicas: 2
+  size: 2Gi
+  storageClass: replicated
+  resourcesPreset: t1.micro
+  users:
+    fraud: {}
+  databases:
+    fraud:
+      roles:
+        admin: [fraud]</code></pre></div>
+      </details>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">4</div><div>
+        <h3><span data-en="Commit, push, and watch them come up" data-ko="커밋·푸시하고 올라오는 모습 지켜보기">Commit, push, and watch them come up</span><span class="where" data-en="Bastion" data-ko="배스천">Bastion</span></h3>
+      </div></div>
+      <div class="codeblock"><pre><code>cd ~/fraud-infra
+git add platform/kafka.yaml platform/postgres.yaml
+git commit -m "Order Kafka and the case database"
+git push
+
+watch -n 5 kubectl --context tenant get kafka,redis,postgres</code></pre></div>
+      <div class="expect"><span class="ic">✓</span><p data-en="Redis and PostgreSQL reach READY True in one or two minutes; Kafka takes ten to twenty. When the whole room orders at once, the platform installs services one after another. You can start Part 2 as soon as Redis and PostgreSQL are ready — the fraud services wait for Kafka by themselves." data-ko="Redis와 PostgreSQL은 1~2분 안에 READY True가 되고, Kafka는 10~20분 걸립니다. 전원이 동시에 주문하면 플랫폼은 서비스를 하나씩 차례로 설치합니다. Redis와 PostgreSQL만 준비되면 Part 2를 시작해도 됩니다 — 사기 서비스들이 Kafka를 스스로 기다립니다.">Redis and PostgreSQL reach <code>READY True</code> in one or two minutes; Kafka takes ten to twenty. When the whole room orders at once, the platform installs services one after another. You can start Part 2 as soon as Redis and PostgreSQL are ready — the fraud services wait for Kafka by themselves.</p></div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">5</div><div>
+        <h3><span data-en="Under the hood: operators do the work" data-ko="내부 들여다보기: 오퍼레이터가 일한다">Under the hood: operators do the work</span><span class="where" data-en="Bastion" data-ko="배스천">Bastion</span></h3>
+        <p data-en="Look at what your three short declarations became. Cozystack turns each application into Helm releases and operator resources; Strimzi runs Kafka, CloudNativePG runs PostgreSQL, and the Redis operator runs Redis — keeping pods and services healthy underneath." data-ko="짧은 선언 세 개가 무엇으로 변했는지 확인합니다. Cozystack은 각 애플리케이션을 Helm 릴리스와 오퍼레이터 리소스로 바꾸고, Strimzi가 Kafka를, CloudNativePG가 PostgreSQL을, Redis 오퍼레이터가 Redis를 운영하며 아래쪽 파드와 서비스를 건강하게 유지합니다.">Look at what your three short declarations became. Cozystack turns each application into Helm releases and operator resources; <strong>Strimzi</strong> runs Kafka, <strong>CloudNativePG</strong> runs PostgreSQL, and the <strong>Redis operator</strong> runs Redis — keeping pods and services healthy underneath.</p>
+      </div></div>
+      <div class="codeblock"><pre><code>kubectl --context tenant get hr
+kubectl --context tenant get clusters.postgresql.cnpg.io
+kubectl --context tenant get pods -l cnpg.io/cluster=postgres-cases -L role
+kubectl --context tenant get svc | grep postgres-cases</code></pre></div>
+      <div class="expect"><span class="ic">✓</span><p data-en="Helm releases, the CloudNativePG cluster behind cases, its primary and replica pods, and PostgreSQL services ending in rw (writes), ro (reads) and r." data-ko="Helm 릴리스, cases 뒤에 있는 CloudNativePG 클러스터, 프라이머리와 복제본 파드, 그리고 rw(쓰기)·ro(읽기)·r로 끝나는 PostgreSQL 서비스가 보입니다.">Helm releases, the CloudNativePG cluster behind <code>cases</code>, its primary and replica pods, and PostgreSQL services ending in <code>rw</code> (writes), <code>ro</code> (reads) and <code>r</code>.</p></div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">6</div><div>
+        <h3><span data-en="Drift: delete Redis and watch it come back" data-ko="드리프트: Redis를 지우고 돌아오는 것 지켜보기">Drift: delete Redis and watch it come back</span><span class="where" data-en="Bastion" data-ko="배스천">Bastion</span></h3>
+        <p data-en="Delete the Redis application by hand — but leave its declaration in Git. Reconciliation compares what exists with what Git declares, and repairs the difference. This is why lasting changes are made in Git, never by hand." data-ko="Redis 애플리케이션을 손으로 지워 보세요 — 단, Git의 선언은 그대로 둡니다. 조정(reconciliation)은 실제 상태와 Git 선언을 비교해 차이를 복구합니다. 그래서 오래가는 변경은 손이 아니라 Git에서 해야 합니다.">Delete the Redis application by hand — but leave its declaration in Git. Reconciliation compares what exists with what Git declares, and repairs the difference. This is why lasting changes are made in Git, never by hand.</p>
+      </div></div>
+      <div class="codeblock"><pre><code>kubectl --context tenant delete redis features
+kubectl --context tenant get redis -w</code></pre></div>
+      <div class="expect"><span class="ic">✓</span><p data-en="features returns within about a minute. Stop watching with Ctrl-C." data-ko="features가 약 1분 안에 돌아옵니다. Ctrl-C로 감시를 멈추세요."><code>features</code> returns within about a minute. Stop watching with <span class="kbd">Ctrl-C</span>.</p></div>
+    </div>
+  </section>
+  <!-- PART 2 -->
+  <section id="part2">
+    <h2><span class="partno">PART 2</span> <span data-en="Fraud scoring" data-ko="사기 스코어링">Fraud scoring</span> <span class="mins">25 min</span></h2>
+    <p class="secintro" data-en="Deploy the scorer into your own cluster, connect the switch to it through Kafka, add a small local language model that explains every block — then run the Part 0 attack again and watch it fail." data-ko="스코어러를 내 클러스터에 배포하고 Kafka를 통해 스위치와 연결한 뒤, 차단 사유를 설명하는 작은 로컬 언어 모델을 붙입니다. 그런 다음 Part 0의 공격을 다시 실행해 막히는 모습을 봅니다.">Deploy the scorer into your own cluster, connect the switch to it through Kafka, add a small local language model that explains every block — then run the Part 0 attack again and watch it fail.</p>
+
+    <figure class="diagram" style="margin:0 0 16px">
+      <svg viewBox="0 0 940 210" role="img" aria-label="Scoring round-trip diagram with 400 millisecond stand-in deadline">
+        <defs><marker id="ah3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink3)"/></marker></defs>
+        <rect class="dbox-warn" x="15" y="55" width="160" height="60" rx="10"/>
+        <text class="dt" x="95" y="82" text-anchor="middle" font-size="15" data-en="Switch" data-ko="스위치">Switch</text>
+        <text class="dts" x="95" y="101" text-anchor="middle" font-size="12" data-en="asks, then answers" data-ko="묻고, 최종 답변">asks, then answers</text>
+        <rect class="dbox" x="255" y="55" width="180" height="60" rx="10"/>
+        <text class="dt" x="345" y="82" text-anchor="middle" font-size="15">Kafka</text>
+        <text class="dlab" x="345" y="101" text-anchor="middle" font-size="12">requests → · ← decisions</text>
+        <rect class="dbox-acc" x="515" y="55" width="180" height="60" rx="10"/>
+        <text class="dt" x="605" y="82" text-anchor="middle" font-size="15" data-en="Scorer" data-ko="스코어러">Scorer</text>
+        <text class="dts" x="605" y="101" text-anchor="middle" font-size="12" data-en="rules + Redis history" data-ko="규칙 + Redis 이력">rules + Redis history</text>
+        <rect class="dbox-blue" x="775" y="55" width="155" height="60" rx="10"/>
+        <text class="dt" x="852" y="82" text-anchor="middle" font-size="15" data-en="Terminal" data-ko="단말기">Terminal</text>
+        <text class="dts" x="852" y="101" text-anchor="middle" font-size="12" data-en="answer in ~10 ms total" data-ko="전체 약 10ms에 답변">answer in ~10 ms total</text>
+        <path d="M175,78 L249,78" stroke="var(--accent)" stroke-width="2.2" fill="none" marker-end="url(#ah3)"/>
+        <path d="M435,78 L509,78" stroke="var(--accent)" stroke-width="2.2" fill="none" marker-end="url(#ah3)"/>
+        <path d="M695,85 L769,85" stroke="var(--ink3)" stroke-width="1.8" fill="none" marker-end="url(#ah3)"/>
+        <path d="M605,115 C605,168 95,168 95,121" stroke="var(--amber)" stroke-width="1.8" fill="none" stroke-dasharray="6 5" marker-end="url(#ah3)"/>
+        <text class="dt" x="350" y="162" text-anchor="middle" font-size="13" data-en="No answer within 400 ms?" data-ko="400ms 안에 답이 없으면?">No answer within 400 ms?</text>
+        <text class="dts" x="350" y="182" text-anchor="middle" font-size="12.5" data-en="The switch decides alone with its old rule — stand-in processing. A slow scorer never stops a payment." data-ko="스위치가 구 규칙으로 혼자 결정합니다 — 스탠드인 처리. 느린 스코어러가 결제를 막는 일은 없습니다.">The switch decides alone with its old rule — <strong>stand-in processing</strong>. A slow scorer never stops a payment.</text>
+      </svg>
+      <figcaption data-en="The scoring round trip. Every payment goes switch → Kafka → scorer → Kafka → switch, and the terminal still gets its answer in about ten milliseconds." data-ko="스코어링 왕복 경로입니다. 모든 결제는 스위치 → Kafka → 스코어러 → Kafka → 스위치를 거치고도 단말기는 약 10밀리초 안에 답변을 받습니다.">The scoring round trip. Every payment goes switch → Kafka → scorer → Kafka → switch, and the terminal still gets its answer in about ten milliseconds.</figcaption>
+    </figure>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">1</div><div>
+        <h3><span data-en="Deploy the scorer and connect the switch" data-ko="스코어러 배포하고 스위치 연결하기">Deploy the scorer and connect the switch</span><span class="where" data-en="Bastion · Switch VM" data-ko="배스천 · 스위치 VM">Bastion · Switch VM</span></h3>
+        <p data-en="First hand the services the database password: Cozystack generated it on the platform side; this command copies the fraud user's password into a Secret in your cluster, where cases and dashboard read it. (The original README shows the full command with the generated value from your own Secret.) Then deploy the three fraud services. The scorer is deliberately small — CPU limit 500m — so Part 4 can push it past capacity." data-ko="먼저 서비스에 데이터베이스 비밀번호를 전달합니다. Cozystack이 플랫폼 쪽에서 생성한 비밀번호이며, 이 명령은 fraud 사용자의 비밀번호를 내 클러스터의 Secret으로 복사해 cases와 dashboard가 읽게 합니다. (원본 README에는 본인 Secret에서 가져온 값이 들어간 전체 명령이 있습니다.) 그다음 사기 서비스 세 개를 배포합니다. 스코어러는 일부러 작게(CPU 제한 500m) 만들어 뒀습니다 — Part 4에서 용량 한계까지 밀어붙이기 위해서입니다.">First hand the services the database password: Cozystack generated it on the platform side; this command copies the <code>fraud</code> user's password into a Secret in your cluster, where <code>cases</code> and <code>dashboard</code> read it. (The original README shows the full command with the generated value from your own Secret.) Then deploy the three fraud services. The scorer is deliberately small — CPU limit <code>500m</code> — so Part 4 can push it past capacity.</p>
+      </div></div>
+      <div class="codeblock"><pre><code>cd ~/workshop
+kubectl --context fraud -n fraud create secret generic cases-db \
+  --from-literal=password="&lt;from Secret postgres-cases-credentials&gt;"
+
+kubectl --context fraud apply -f manifests/02-scoring.yaml
+kubectl --context fraud -n fraud get pods -w</code></pre></div>
+      <div class="expect"><span class="ic">✓</span><p data-en="secret/cases-db created, then scorer, cases and dashboard all Running. Services reach the platform by names like kafka-kafka-kafka-bootstrap.tenant-austinNN.svc.cozy.local — your cluster is a tenant of the platform, on the same network." data-ko="secret/cases-db가 생성되고 scorer, cases, dashboard가 모두 Running이 됩니다. 서비스들은 kafka-kafka-kafka-bootstrap.tenant-austinNN.svc.cozy.local 같은 플랫폼 이름으로 접근합니다 — 내 클러스터는 플랫폼의 테넌트로서 같은 네트워크에 있습니다."><code>secret/cases-db created</code>, then <code>scorer</code>, <code>cases</code> and <code>dashboard</code> all <code>Running</code>. Services reach the platform by names like <code>kafka-kafka-kafka-bootstrap.tenant-austinNN.svc.cozy.local</code> — your cluster is a tenant of the platform, on the same network.</p></div>
+      <p data-en="The scorer is up, but nobody asks it anything yet. Confirm Kafka is READY True, enter the switch VM, point the switch at Kafka, and restart it:" data-ko="스코어러는 떴지만 아직 아무도 묻지 않습니다. Kafka가 READY True인지 확인하고, 스위치 VM에 들어가 스위치가 Kafka를 보게 한 뒤 재시작합니다:">The scorer is up, but nobody asks it anything yet. Confirm Kafka is <code>READY True</code>, enter the switch VM, point the switch at Kafka, and restart it:</p>
+      <div class="codeblock"><pre><code>kubectl --context tenant get kafka
+virtctl console vm-instance-switch
+<span class="cm"># inside the VM (ubuntu / ubuntu):</span>
+sudo sed -i 's#^KAFKA_BOOTSTRAP=.*#KAFKA_BOOTSTRAP=kafka-kafka-kafka-bootstrap:9092#' /etc/auth-switch/env
+cat /etc/auth-switch/env
+sudo systemctl restart auth-switch
+journalctl -u auth-switch -f</code></pre></div>
+      <div class="expect"><span class="ic">✓</span><p data-en="“switch started in SCORING mode”, then “100 authorizations, 0 declined, stand-in 0.0%” (a little stand-in in the first seconds is just warm-up). Leave with Ctrl-] and open https://fraud.austinNN.workshop.aenix.io — about 20 authorizations a second, almost no declines, decision latency visible, Kafka lag near zero." data-ko="“switch started in SCORING mode”가 찍히고 이어서 “100 authorizations, 0 declined, stand-in 0.0%”가 나옵니다(처음 몇 초의 스탠드인은 워밍업입니다). Ctrl-]로 나와 https://fraud.austinNN.workshop.aenix.io를 여세요 — 초당 약 20건 승인, 거절은 거의 없고, 결정 지연 시간과 0에 가까운 Kafka 랙이 보입니다.">“switch started in SCORING mode”, then “100 authorizations, 0 declined, stand-in 0.0%” (a little stand-in in the first seconds is just warm-up). Leave with <span class="kbd">Ctrl-]</span> and open <code>https://fraud.austinNN.workshop.aenix.io</code> — about 20 authorizations a second, almost no declines, decision latency visible, Kafka lag near zero.</p></div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">2</div><div>
+        <h3><span data-en="A language model explains every blocked payment" data-ko="언어 모델이 차단 사유를 설명한다">A language model explains every blocked payment</span><span class="where" data-en="Bastion" data-ko="배스천">Bastion</span></h3>
+        <p data-en="A decline needs a reason a support agent can read to the customer. Deploy the explainer: Qwen2.5 0.5B Instruct served by llama.cpp, running on CPU inside your cluster. The model weights come in; no card data goes out, and no external AI service is involved. The cases service already knows the explainer's address and has been waiting for it." data-ko="거절에는 상담원이 고객에게 읽어 줄 수 있는 사유가 필요합니다. 설명기를 배포합니다. llama.cpp로 서빙되는 Qwen2.5 0.5B Instruct가 내 클러스터 안 CPU에서 돕니다. 모델 가중치만 들어오고 카드 데이터는 밖으로 나가지 않으며, 외부 AI 서비스는 없습니다. cases 서비스는 이미 설명기 주소를 알고 기다리고 있었습니다.">A decline needs a reason a support agent can read to the customer. Deploy the explainer: <strong>Qwen2.5 0.5B Instruct</strong> served by llama.cpp, running on CPU <em>inside</em> your cluster. The model weights come in; no card data goes out, and no external AI service is involved. The <code>cases</code> service already knows the explainer's address and has been waiting for it.</p>
+      </div></div>
+      <div class="codeblock"><pre><code>cat manifests/03-explainer.yaml
+kubectl --context fraud apply -f manifests/03-explainer.yaml
+kubectl --context fraud -n fraud rollout status deploy/explainer --timeout=5m</code></pre></div>
+      <div class="expect"><span class="ic">✓</span><p data-en="“successfully rolled out” within a minute or two — the pod downloads a 400 MB model and loads it. If the wait times out, just run the rollout status command again." data-ko="1~2분 안에 “successfully rolled out”가 나옵니다 — 파드가 400MB 모델을 내려받아 로드합니다. 대기가 시간 초과되면 rollout status 명령을 다시 실행하면 됩니다.">“successfully rolled out” within a minute or two — the pod downloads a 400 MB model and loads it. If the wait times out, just run the rollout status command again.</p></div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">3</div><div>
+        <h3><span data-en="Run the attack again — this time it fails" data-ko="공격을 다시 실행 — 이번에는 막힌다">Run the attack again — this time it fails</span><span class="where" data-en="Bastion · Dashboard" data-ko="배스천 · 대시보드">Bastion · Dashboard</span></h3>
+        <p data-en="Same job, same cards as Part 0. Keep the dashboard open while it runs." data-ko="Part 0와 같은 잡, 같은 카드입니다. 실행하는 동안 대시보드를 열어 두세요.">Same job, same cards as Part 0. Keep the dashboard open while it runs.</p>
+      </div></div>
+      <div class="cards">
+        <div class="card"><span class="tag">CARD TESTING</span><h4 data-en="Tiny probes, then a big buy" data-ko="작은 탐색 결제 후 큰 구매">Tiny probes, then a big buy</h4><p data-en="Three stolen cards make dozens of $0.50–$3.00 online payments to check they work, then try a big electronics purchase." data-ko="도난 카드 세 장이 작동 확인용으로 $0.50–$3.00짜리 온라인 결제를 수십 번 시도한 뒤 큰 전자제품 구매를 노립니다.">Three stolen cards make dozens of $0.50–$3.00 online payments to check they work, then try a big electronics purchase.</p></div>
+        <div class="card"><span class="tag">IMPOSSIBLE TRAVEL</span><h4 data-en="Dallas, then Lagos in 2 minutes" data-ko="댈러스, 2분 뒤 라고스">Dallas, then Lagos in 2 minutes</h4><p data-en="A card used in Dallas is used in Lagos two minutes later — physically impossible for one cardholder." data-ko="댈러스에서 쓰인 카드가 2분 뒤 라고스에서 쓰입니다 — 카드 소지자 한 명에게는 물리적으로 불가능합니다.">A card used in Dallas is used in Lagos two minutes later — physically impossible for one cardholder.</p></div>
+        <div class="card"><span class="tag">BIN ATTACK</span><h4 data-en="60 card numbers in a row" data-ko="연속된 카드 번호 60개">60 card numbers in a row</h4><p data-en="Sixty sequential card numbers from the same bank range (BIN), one dollar each — a guessing sweep." data-ko="같은 은행 구간(BIN)의 연속 카드 번호 60개를 1달러씩 긁는 추측 공격입니다.">Sixty sequential card numbers from the same bank range (BIN), one dollar each — a guessing sweep.</p></div>
+      </div>
+      <div class="codeblock"><pre><code>kubectl --context fraud apply -f manifests/04-attack.yaml
+kubectl --context fraud -n fraud logs job/attack -f</code></pre></div>
+      <div class="expect"><span class="ic">✓</span><p data-en="Most payments are now declined. The first few probes of each card still pass — one tiny payment looks like any other; the pattern becomes clear after a handful. Card testing is stopped by about the sixth probe, a BIN attack by about the eighth card. On the dashboard, blocked transactions appear with reason codes, and within a minute or two each gets a plain-language explanation from the model — one by one, and occasionally clumsy: it is a very small model on one CPU. The rules and weights live in one short file: app/internal/scoring/rules.go." data-ko="이제 대부분의 결제가 거절됩니다. 각 카드의 처음 몇 번 탐색은 여전히 통과합니다 — 작은 결제 하나는 평범해 보이고, 패턴은 몇 번 쌓여야 드러납니다. 카드 테스팅은 여섯 번째 탐색쯤, BIN 공격은 여덟 번째 카드쯤에서 멈춥니다. 대시보드에는 사유 코드와 함께 차단된 거래가 뜨고, 1~2분 안에 모델이 쉬운 말로 쓴 설명이 하나씩 붙습니다. CPU 하나로 도는 아주 작은 모델이라 가끔 문장이 어색합니다. 규칙과 가중치는 app/internal/scoring/rules.go 한 파일에 있습니다.">Most payments are now <strong>declined</strong>. The first few probes of each card still pass — one tiny payment looks like any other; the pattern becomes clear after a handful. Card testing is stopped by about the sixth probe, a BIN attack by about the eighth card. On the dashboard, blocked transactions appear with reason codes, and within a minute or two each gets a plain-language explanation from the model — one by one, and occasionally clumsy: it is a very small model on one CPU. The rules and weights live in one short file: <code>app/internal/scoring/rules.go</code>.</p></div>
+    </div>
+  </section>
+
+  <!-- PART 3 -->
+  <section id="part3">
+    <h2><span class="partno">PART 3</span> <span data-en="Grow the system with the catalog" data-ko="카탈로그로 시스템 확장하기">Grow the system with the catalog</span> <span class="mins">30 min</span></h2>
+    <p class="secintro" data-en="Fraud analysts now want to run any query over every payment ever answered — without slowing the payment flow. So you add an analytics database beside the system, without touching it: ClickHouse reads the journal straight from Kafka, and reports land in an S3 bucket. The whole path is three catalog services and one SQL file, with no code of yours in between." data-ko="이제 사기 분석가들이 답변이 끝난 모든 결제를 대상으로 자유롭게 쿼리를 돌리고 싶어 합니다 — 결제 흐름을 느리게 하지 않으면서요. 그래서 시스템 옆에, 건드리지 않고, 분석용 데이터베이스를 추가합니다. ClickHouse가 Kafka에서 저널을 직접 읽고, 리포트는 S3 버킷에 쌓입니다. 전체 경로는 카탈로그 서비스 세 개와 SQL 파일 하나로, 중간에 내 코드는 없습니다.">Fraud analysts now want to run any query over every payment ever answered — without slowing the payment flow. So you add an analytics database <em>beside</em> the system, without touching it: ClickHouse reads the journal straight from Kafka, and reports land in an S3 bucket. The whole path is three catalog services and one SQL file, with no code of yours in between.</p>
+
+    <figure class="diagram" style="margin:0 0 16px">
+      <svg viewBox="0 0 940 170" role="img" aria-label="Analytics pipeline diagram: Kafka journal to ClickHouse stream, materialized view, MergeTree table, SQL queries, S3 report">
+        <defs><marker id="ah4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink3)"/></marker></defs>
+        <rect class="dbox" x="10" y="50" width="140" height="62" rx="10"/>
+        <text class="dt" x="80" y="77" text-anchor="middle" font-size="14">Kafka</text>
+        <text class="dlab" x="80" y="96" text-anchor="middle" font-size="12">auth.journal</text>
+        <rect class="dbox-acc" x="215" y="50" width="160" height="62" rx="10"/>
+        <text class="dt" x="295" y="74" text-anchor="middle" font-size="14">journal_stream</text>
+        <text class="dts" x="295" y="93" text-anchor="middle" font-size="12" data-en="Kafka table in ClickHouse" data-ko="ClickHouse 안의 Kafka 테이블">Kafka table in ClickHouse</text>
+        <text class="dlab" x="295" y="128" text-anchor="middle" font-size="11.5">payments_stream_mv →</text>
+        <rect class="dbox-acc" x="440" y="50" width="150" height="62" rx="10"/>
+        <text class="dt" x="515" y="77" text-anchor="middle" font-size="14">payments</text>
+        <text class="dts" x="515" y="96" text-anchor="middle" font-size="12">MergeTree</text>
+        <rect class="dbox-blue" x="655" y="50" width="130" height="62" rx="10"/>
+        <text class="dt" x="720" y="77" text-anchor="middle" font-size="14" data-en="Analyst SQL" data-ko="분석가 SQL">Analyst SQL</text>
+        <text class="dts" x="720" y="96" text-anchor="middle" font-size="12" data-en="any query, anytime" data-ko="언제든 자유 쿼리">any query, anytime</text>
+        <rect class="dbox" x="830" y="50" width="105" height="62" rx="10"/>
+        <text class="dt" x="882" y="77" text-anchor="middle" font-size="13.5">S3 Bucket</text>
+        <text class="dlab" x="882" y="96" text-anchor="middle" font-size="11">report.csv</text>
+        <path d="M150,81 L209,81" stroke="var(--ink3)" stroke-width="1.8" fill="none" marker-end="url(#ah4)"/>
+        <path d="M375,81 L434,81" stroke="var(--accent)" stroke-width="2.2" fill="none" marker-end="url(#ah4)"/>
+        <path d="M590,81 L649,81" stroke="var(--ink3)" stroke-width="1.8" fill="none" marker-end="url(#ah4)"/>
+        <path d="M785,81 L824,81" stroke="var(--ink3)" stroke-width="1.8" fill="none" marker-end="url(#ah4)"/>
+      </svg>
+      <figcaption data-en="ClickHouse is one more independent reader of the journal — beside cases and the dashboard. The materialized view moves every journal entry into the MergeTree table automatically; reports are exported from SQL straight into the bucket." data-ko="ClickHouse는 cases·대시보드 옆에 붙는 저널의 또 하나의 독립 독자입니다. 머티리얼라이즈드 뷰가 모든 저널 항목을 MergeTree 테이블로 자동 이동시키고, 리포트는 SQL에서 버킷으로 바로 내보냅니다.">ClickHouse is one more independent reader of the journal — beside <code>cases</code> and the dashboard. The materialized view moves every journal entry into the MergeTree table automatically; reports are exported from SQL straight into the bucket.</figcaption>
+    </figure>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">1</div><div>
+        <h3><span data-en="ClickHouse for the fraud analysts" data-ko="분석가용 ClickHouse 주문">ClickHouse for the fraud analysts</span><span class="where" data-en="Bastion · Git" data-ko="배스천 · Git">Bastion · Git</span></h3>
+        <p data-en="Write platform/clickhouse.yaml from the ClickHouse docs: name analytics, one replica, one shard, 5Gi on replicated storage, preset t1.medium, user fraud with password Fraud2026 — and ClickHouse Keeper switched off, because a single node does not need it. Do not take t1.small: ClickHouse runs out of memory reading the payment journal." data-ko="ClickHouse 문서를 보고 platform/clickhouse.yaml을 작성합니다. 이름 analytics, 복제본 1, 샤드 1, 복제 스토리지 5Gi, 프리셋 t1.medium, 비밀번호 Fraud2026인 사용자 fraud — 그리고 단일 노드에는 필요 없는 ClickHouse Keeper는 끕니다. t1.small은 쓰지 마세요. 결제 저널을 읽다가 메모리가 부족해집니다.">Write <code>platform/clickhouse.yaml</code> from the ClickHouse docs: name <code>analytics</code>, one replica, one shard, 5Gi on replicated storage, preset <code>t1.medium</code>, user <code>fraud</code> with password <code>Fraud2026</code> — and ClickHouse Keeper switched <strong>off</strong>, because a single node does not need it. Do <strong>not</strong> take <code>t1.small</code>: ClickHouse runs out of memory reading the payment journal.</p>
+      </div></div>
+      <details class="solution">
+        <summary data-en="Solution — platform/clickhouse.yaml" data-ko="정답 — platform/clickhouse.yaml">Solution — platform/clickhouse.yaml</summary>
+        <div class="codeblock"><pre><code>apiVersion: apps.cozystack.io/v1alpha1
+kind: ClickHouse
+metadata:
+  name: analytics
+spec:
+  replicas: 1
+  shards: 1
+  resourcesPreset: t1.medium
+  size: 5Gi
+  storageClass: replicated
+  clickhouseKeeper:
+    enabled: false
+  users:
+    fraud:
+      password: Fraud2026</code></pre></div>
+        <div class="codeblock"><pre><code>cd ~/fraud-infra
+git add platform/clickhouse.yaml
+git commit -m "Order ClickHouse for the analysts"
+git push</code></pre></div>
+      </details>
+      <div class="expect"><span class="ic">✓</span><p data-en="Wait until analytics shows ready in the dashboard before the next step." data-ko="다음 단계 전에 대시보드에서 analytics가 준비될 때까지 기다리세요.">Wait until <code>analytics</code> shows ready in the dashboard before the next step.</p></div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">2</div><div>
+        <h3><span data-en="Read the journal straight from Kafka" data-ko="Kafka에서 저널을 직접 읽기">Read the journal straight from Kafka</span><span class="where" data-en="Bastion" data-ko="배스천">Bastion</span></h3>
+        <p data-en="Load manifests/05-analytics.sql into ClickHouse by piping it to the client inside the database pod. The file creates the three objects in the diagram above — a Kafka-reading table, a MergeTree store, and the materialized view between them. No application sits in between: ClickHouse reads Kafka directly." data-ko="manifests/05-analytics.sql을 데이터베이스 파드 안의 클라이언트로 파이프해 ClickHouse에 로드합니다. 이 파일은 위 다이어그램의 객체 세 개 — Kafka를 읽는 테이블, MergeTree 저장소, 그 사이의 머티리얼라이즈드 뷰 — 를 만듭니다. 중간에 애플리케이션은 없습니다. ClickHouse가 Kafka를 직접 읽습니다.">Load <code>manifests/05-analytics.sql</code> into ClickHouse by piping it to the client inside the database pod. The file creates the three objects in the diagram above — a Kafka-reading table, a MergeTree store, and the materialized view between them. No application sits in between: ClickHouse reads Kafka directly.</p>
+      </div></div>
+      <div class="codeblock"><pre><code>cd ~/workshop
+kubectl --context tenant exec -i chi-clickhouse-analytics-clickhouse-0-0-0 \
+  -c clickhouse -- clickhouse-client --user fraud --password Fraud2026 \
+  --multiquery &lt; manifests/05-analytics.sql
+
+<span class="cm"># then ask your own questions interactively (exit to leave):</span>
+kubectl --context tenant exec -it chi-clickhouse-analytics-clickhouse-0-0-0 \
+  -c clickhouse -- clickhouse-client --user fraud --password Fraud2026</code></pre></div>
+      <div class="codeblock"><pre><code>SELECT merchant, count(*)
+FROM payments
+WHERE decision = 'DECLINE'
+GROUP BY merchant
+ORDER BY count(*) DESC
+LIMIT 10;</code></pre></div>
+      <div class="expect"><span class="ic">✓</span><p data-en="No errors from the load; the file's three example queries print at the end (possibly still empty right after loading). After a minute of catch-up: up to ten merchants with decline counts, most first. The other examples group declines by minute and reason, and show stand-in counts and shares per minute." data-ko="로드에서 오류가 없고, 파일 끝의 예제 쿼리 세 개 결과가 출력됩니다(로드 직후에는 비어 있을 수 있습니다). 1분쯤 따라잡은 뒤에는 거절 건수가 많은 가맹점 최대 10곳이 순서대로 나옵니다. 다른 예제는 분·사유별 거절 집계와 분당 스탠드인 건수·비율을 보여 줍니다.">No errors from the load; the file's three example queries print at the end (possibly still empty right after loading). After a minute of catch-up: up to ten merchants with decline counts, most first. The other examples group declines by minute and reason, and show stand-in counts and shares per minute.</p></div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">3</div><div>
+        <h3><span data-en="A bucket for reports" data-ko="리포트용 버킷">A bucket for reports</span><span class="where" data-en="Git · Dashboard" data-ko="Git · 대시보드">Git · Dashboard</span></h3>
+        <p data-en="Order a Bucket named reports with one user, analytics — straight into Git like everything else. A bucket user is not a person: it is a dedicated pair of S3 keys for this bucket only, stored by Cozystack in a Secret. ClickHouse writes reports with exactly those keys, and nothing else." data-ko="사용자 analytics 하나를 가진 reports라는 Bucket을 주문합니다 — 다른 모든 것처럼 Git에 바로 넣습니다. 버킷 사용자는 사람이 아니라 이 버킷 전용 S3 키 쌍이며, Cozystack이 Secret에 보관합니다. ClickHouse는 정확히 그 키로만 리포트를 씁니다.">Order a <code>Bucket</code> named <code>reports</code> with one user, <code>analytics</code> — straight into Git like everything else. A bucket user is not a person: it is a dedicated pair of S3 keys for this bucket only, stored by Cozystack in a Secret. ClickHouse writes reports with exactly those keys, and nothing else.</p>
+      </div></div>
+      <details class="solution">
+        <summary data-en="Solution — platform/bucket.yaml" data-ko="정답 — platform/bucket.yaml">Solution — platform/bucket.yaml</summary>
+        <div class="codeblock"><pre><code>apiVersion: apps.cozystack.io/v1alpha1
+kind: Bucket
+metadata:
+  name: reports
+spec:
+  users:
+    analytics: {}</code></pre></div>
+        <div class="codeblock"><pre><code>cd ~/fraud-infra
+git add platform/bucket.yaml
+git commit -m "Order a bucket for reports"
+git push</code></pre></div>
+      </details>
+      <p data-en="When reports is ready, read its keys in the dashboard (Bucket → reports → Secrets → bucket-reports-analytics-credentials): you need accessKey, secretKey and bucketName. The endpoint s3.workshop.aenix.io is already in the query. Export the report from the ClickHouse client:" data-ko="reports가 준비되면 대시보드(Bucket → reports → Secrets → bucket-reports-analytics-credentials)에서 키를 확인합니다. accessKey, secretKey, bucketName이 필요합니다. 엔드포인트 s3.workshop.aenix.io는 쿼리에 이미 들어 있습니다. ClickHouse 클라이언트에서 리포트를 내보내세요:">When <code>reports</code> is ready, read its keys in the dashboard (Bucket → reports → Secrets → <code>bucket-reports-analytics-credentials</code>): you need <code>accessKey</code>, <code>secretKey</code> and <code>bucketName</code>. The endpoint <code>s3.workshop.aenix.io</code> is already in the query. Export the report from the ClickHouse client:</p>
+      <div class="codeblock"><pre><code>INSERT INTO FUNCTION s3(
+  'https://s3.workshop.aenix.io/&lt;bucketName&gt;/daily-report.csv',
+  '&lt;accessKey&gt;', '&lt;secretKey&gt;', 'CSVWithNames')
+SETTINGS s3_truncate_on_insert=1
+SELECT merchant, count(*)
+FROM payments
+WHERE decision = 'DECLINE'
+GROUP BY merchant
+ORDER BY count(*) DESC
+LIMIT 10;</code></pre></div>
+      <div class="expect"><span class="ic">✓</span><p data-en="daily-report.csv appears in the bucket UI at https://bucket-reports.austinNN.workshop.aenix.io. Journal → analytics → finished report, with zero code written by you." data-ko="https://bucket-reports.austinNN.workshop.aenix.io의 버킷 UI에 daily-report.csv가 나타납니다. 저널 → 분석 → 완성된 리포트까지, 직접 쓴 코드는 없습니다."><code>daily-report.csv</code> appears in the bucket UI at <code>https://bucket-reports.austinNN.workshop.aenix.io</code>. Journal → analytics → finished report, with zero code written by you.</p></div>
+    </div>
+  </section>
+
+  <!-- PART 4 -->
+  <section id="part4">
+    <h2><span class="partno">PART 4</span> <span data-en="Production day" data-ko="운영의 날">Production day</span> <span class="mins">30 min</span></h2>
+    <p class="secintro" data-en="Three incidents, one after another: a traffic spike, a dead database node, and a server move under the running switch. Keep the fraud dashboard open the whole time — it is your window into all three." data-ko="사고 세 개가 연달아 터집니다. 트래픽 급증, 데이터베이스 노드 사망, 실행 중인 스위치 아래에서의 서버 이동. 내내 사기 대시보드를 열어 두세요 — 세 사고 모두를 보는 창입니다.">Three incidents, one after another: a traffic spike, a dead database node, and a server move under the running switch. Keep the fraud dashboard open the whole time — it is your window into all three.</p>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">1</div><div>
+        <h3><span data-en="Black Friday, with an autoscaler" data-ko="오토스케일러와 함께하는 블랙프라이데이">Black Friday, with an autoscaler</span><span class="where" data-en="Bastion · Dashboard" data-ko="배스천 · 대시보드">Bastion · Dashboard</span></h3>
+        <p data-en="Write a HorizontalPodAutoscaler for the scorer: minimum 1, maximum 8 replicas, CPU target AverageValue 250m. Eight is the maximum useful number — auth.requests has eight partitions. Save it as ~/workshop/hpa.yaml (it belongs to your cluster, not the platform repo) and apply it. Then raise the traffic: the terminals read their rate from a ConfigMap, so no restart is needed." data-ko="스코어러용 HorizontalPodAutoscaler를 작성합니다. 최소 1, 최대 8개 복제본, CPU 목표는 AverageValue 250m. 8이 유용한 최대치입니다 — auth.requests 파티션이 8개이기 때문입니다. ~/workshop/hpa.yaml로 저장하고(플랫폼 저장소가 아니라 내 클러스터 소속입니다) 적용합니다. 그런 다음 트래픽을 올립니다. 단말기는 ConfigMap에서 속도를 읽으므로 재시작이 필요 없습니다.">Write a <code>HorizontalPodAutoscaler</code> for the scorer: minimum 1, <strong>maximum 8</strong> replicas, CPU target <code>AverageValue 250m</code>. Eight is the maximum useful number — <code>auth.requests</code> has eight partitions. Save it as <code>~/workshop/hpa.yaml</code> (it belongs to your cluster, not the platform repo) and apply it. Then raise the traffic: the terminals read their rate from a ConfigMap, so no restart is needed.</p>
+      </div></div>
+      <details class="solution">
+        <summary data-en="Solution — hpa.yaml" data-ko="정답 — hpa.yaml">Solution — hpa.yaml</summary>
+        <div class="codeblock"><pre><code>apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: scorer
+  namespace: fraud
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: scorer
+  minReplicas: 1
+  maxReplicas: 8
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: AverageValue
+          averageValue: 250m</code></pre></div>
+      </details>
+      <div class="codeblock"><pre><code>kubectl --context fraud apply -f hpa.yaml
+kubectl --context fraud -n fraud patch configmap traffic -p '{"data":{"rate":"200"}}'
+kubectl --context fraud -n fraud get hpa scorer -w</code></pre></div>
+      <div class="expect"><span class="ic">✓</span><p data-en="Within a minute or two, stand-in jumps to 100% and the scoring queue grows — the single small scorer cannot keep up, so the switch decides alone and fraud would slip through. Then replicas climb 1 → 2 → 4 and, within about three minutes, stand-in falls back to a few percent. Afterwards, restore a normal day with rate 20; the HPA scales down by itself after about five minutes." data-ko="1~2분 안에 스탠드인이 100%로 치솟고 스코어링 큐가 자랍니다 — 작은 스코어러 하나가 감당 못 해 스위치가 혼자 결정하고, 그 틈으로 사기가 새어 나갈 상황입니다. 이어서 복제본이 1 → 2 → 4로 늘고 약 3분 안에 스탠드인이 몇 %로 떨어집니다. 끝나면 rate를 20으로 되돌리세요. HPA가 약 5분 뒤 스스로 줄여 줍니다.">Within a minute or two, stand-in jumps to <strong>100%</strong> and the scoring queue grows — the single small scorer cannot keep up, so the switch decides alone and fraud would slip through. Then replicas climb 1 → 2 → 4 and, within about three minutes, stand-in falls back to a few percent. Afterwards, restore a normal day with <code>rate 20</code>; the HPA scales down by itself after about five minutes.</p></div>
+      <figure class="diagram" style="margin:12px 0 2px">
+        <svg viewBox="0 0 940 190" role="img" aria-label="Kafka partitions as supermarket lanes: eight partitions, at most eight scorers working, extra scorers idle">
+          <defs><marker id="ah5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink3)"/></marker></defs>
+          <text class="dt" x="10" y="30" font-size="15" data-en="auth.requests — 8 partitions = 8 checkout lanes" data-ko="auth.requests — 파티션 8개 = 계산대 8줄">auth.requests — 8 partitions = 8 checkout lanes</text>
+          <g>
+            <rect class="dbox-acc" x="10" y="48" width="104" height="52" rx="9"/><text class="dt" x="62" y="80" text-anchor="middle" font-size="13">scorer 1</text>
+            <rect class="dbox-acc" x="124" y="48" width="104" height="52" rx="9"/><text class="dt" x="176" y="80" text-anchor="middle" font-size="13">scorer 2</text>
+            <rect class="dbox-acc" x="238" y="48" width="104" height="52" rx="9"/><text class="dt" x="290" y="80" text-anchor="middle" font-size="13">scorer 3</text>
+            <rect class="dbox-acc" x="352" y="48" width="104" height="52" rx="9"/><text class="dt" x="404" y="80" text-anchor="middle" font-size="13">scorer 4</text>
+            <rect class="dbox-acc" x="466" y="48" width="104" height="52" rx="9"/><text class="dt" x="518" y="80" text-anchor="middle" font-size="13">scorer 5</text>
+            <rect class="dbox-acc" x="580" y="48" width="104" height="52" rx="9"/><text class="dt" x="632" y="80" text-anchor="middle" font-size="13">scorer 6</text>
+            <rect class="dbox-acc" x="694" y="48" width="104" height="52" rx="9"/><text class="dt" x="746" y="80" text-anchor="middle" font-size="13">scorer 7</text>
+            <rect class="dbox-acc" x="808" y="48" width="104" height="52" rx="9"/><text class="dt" x="860" y="80" text-anchor="middle" font-size="13">scorer 8</text>
+            <rect class="dbox-bad" x="124" y="118" width="104" height="52" rx="9"/><text class="dt" x="176" y="143" text-anchor="middle" font-size="13">scorer 9</text><text class="dts" x="176" y="161" text-anchor="middle" font-size="11.5" data-en="idle · scored 0" data-ko="대기 · 처리 0">idle · scored 0</text>
+            <rect class="dbox-bad" x="238" y="118" width="104" height="52" rx="9"/><text class="dt" x="290" y="143" text-anchor="middle" font-size="13">scorer 10</text><text class="dts" x="290" y="161" text-anchor="middle" font-size="11.5" data-en="idle · scored 0" data-ko="대기 · 처리 0">idle · scored 0</text>
+            <rect class="dbox-bad" x="352" y="118" width="104" height="52" rx="9"/><text class="dt" x="404" y="143" text-anchor="middle" font-size="13">scorer 11</text><text class="dts" x="404" y="161" text-anchor="middle" font-size="11.5" data-en="idle · scored 0" data-ko="대기 · 처리 0">idle · scored 0</text>
+            <rect class="dbox-bad" x="466" y="118" width="104" height="52" rx="9"/><text class="dt" x="518" y="143" text-anchor="middle" font-size="13">scorer 12</text><text class="dts" x="518" y="161" text-anchor="middle" font-size="11.5" data-en="idle · scored 0" data-ko="대기 · 처리 0">idle · scored 0</text>
+          </g>
+          <text class="dts" x="700" y="150" font-size="13" data-en="Optional check: pin the HPA to 12 and read the scorer logs —" data-ko="선택 확인: HPA를 12로 고정하고 스코어러 로그를 보세요 —">Optional check: pin the HPA to 12 and read the scorer logs —</text>
+          <text class="dts" x="700" y="170" font-size="13" data-en="8 report payments, 4 report “scored 0”. Then set it back to 1–8." data-ko="8개는 결제를 보고하고 4개는 “scored 0”입니다. 이후 1–8로 되돌리세요.">8 report payments, 4 report “scored 0”. Then set it back to 1–8.</text>
+        </svg>
+        <figcaption data-en="In a Kafka consumer group, one partition is read by one consumer at a time. Adding cashiers does not create more lanes — how far a streaming system scales is decided when the topic is created, not when pods are added." data-ko="Kafka 컨슈머 그룹에서는 파티션 하나를 한 번에 한 컨슈머만 읽습니다. 계산원을 늘린다고 계산대가 늘지 않습니다 — 스트리밍 시스템이 얼마나 확장되는지는 파드를 추가할 때가 아니라 토픽을 만들 때 결정됩니다.">In a Kafka consumer group, one partition is read by one consumer at a time. Adding cashiers does not create more lanes — <strong>how far a streaming system scales is decided when the topic is created, not when pods are added.</strong></figcaption>
+      </figure>
+      <div class="codeblock"><pre><code><span class="cm"># back to a normal day:</span>
+kubectl --context fraud -n fraud patch configmap traffic -p '{"data":{"rate":"20"}}'</code></pre></div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">2</div><div>
+        <h3><span data-en="The primary database node goes down" data-ko="프라이머리 데이터베이스 노드가 죽는다">The primary database node goes down</span><span class="where" data-en="Bastion · Dashboard" data-ko="배스천 · 대시보드">Bastion · Dashboard</span></h3>
+        <p data-en="Find the primary of the PostgreSQL cluster, then delete its pod as if its server had died. --grace-period=5 just shortens the shutdown wait." data-ko="PostgreSQL 클러스터의 프라이머리를 찾은 뒤, 서버가 죽은 것처럼 그 파드를 삭제합니다. --grace-period=5는 종료 대기 시간을 줄일 뿐입니다.">Find the primary of the PostgreSQL cluster, then delete its pod as if its server had died. <code>--grace-period=5</code> just shortens the shutdown wait.</p>
+      </div></div>
+      <div class="codeblock"><pre><code>kubectl --context tenant get pods -l cnpg.io/cluster=postgres-cases -L role
+kubectl --context tenant delete pod &lt;the primary pod&gt; --grace-period=5
+kubectl --context tenant get pods -l cnpg.io/cluster=postgres-cases -L role -w</code></pre></div>
+      <div class="expect"><span class="ic">✓</span><p data-en="Within seconds the replica becomes primary, and the deleted pod returns as the new replica. On the dashboard, the database panel shows “database unavailable” for a few seconds and the case queue grows — but payments are not affected: the switch never talks to the database. Its journal waits safely in Kafka." data-ko="몇 초 안에 복제본이 프라이머리가 되고, 삭제된 파드는 새 복제본으로 돌아옵니다. 대시보드에서는 데이터베이스 패널이 몇 초간 “database unavailable”를 표시하고 케이스 큐가 자랍니다 — 하지만 결제는 영향이 없습니다. 스위치는 데이터베이스와 직접 통신하지 않고, 저널은 Kafka에서 안전하게 기다립니다.">Within seconds the replica becomes <code>primary</code>, and the deleted pod returns as the new replica. On the dashboard, the database panel shows “database unavailable” for a few seconds and the case queue grows — but <strong>payments are not affected</strong>: the switch never talks to the database. Its journal waits safely in Kafka.</p></div>
+      <div class="codeblock"><pre><code>kubectl --context fraud -n fraud logs deploy/cases --tail=20</code></pre></div>
+      <div class="expect"><span class="ic">✓</span><p data-en="“database unavailable, holding … messages, retrying”, then the backlog is written. The dashboard's reconciliation line compares journaled vs. stored — within a minute or two it shows missing: 0. Not one case was lost." data-ko="“database unavailable, holding … messages, retrying”가 찍히고 이어서 밀린 기록이 쓰입니다. 대시보드의 조정 라인은 저널 기록과 저장된 기록을 비교합니다 — 1~2분 안에 missing: 0이 됩니다. 케이스는 하나도 잃지 않았습니다.">“database unavailable, holding … messages, retrying”, then the backlog is written. The dashboard's reconciliation line compares journaled vs. stored — within a minute or two it shows <code>missing: 0</code>. <strong>Not one case was lost.</strong></p></div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">3</div><div>
+        <h3><span data-en="The switch moves to another server, mid-flow" data-ko="결제 도중 스위치가 다른 서버로 이동">The switch moves to another server, mid-flow</span><span class="where" data-en="Bastion · Dashboard" data-ko="배스천 · 대시보드">Bastion · Dashboard</span></h3>
+        <p data-en="The server under the switch needs maintenance. In a bank that usually means a 3 a.m. change window; here the VM live-migrates while it keeps answering terminals. Its memory is copied to the new server while it works, and the disk does not move at all — it sits on replicated storage both servers can reach." data-ko="스위치 아래 서버에 점검이 필요합니다. 은행이라면 보통 새벽 3시 변경 윈도우를 잡겠지만, 여기서는 VM이 단말기에 답을 계속하면서 라이브 마이그레이션합니다. 실행 중인 VM의 메모리가 새 서버로 복사되고, 디스크는 아예 움직이지 않습니다 — 양쪽 서버가 닿을 수 있는 복제 스토리지 위에 있기 때문입니다.">The server under the switch needs maintenance. In a bank that usually means a 3 a.m. change window; here the VM <strong>live-migrates</strong> while it keeps answering terminals. Its memory is copied to the new server while it works, and the disk does not move at all — it sits on replicated storage both servers can reach.</p>
+      </div></div>
+      <div class="codeblock"><pre><code>kubectl --context tenant get vmi vm-instance-switch -o wide
+virtctl migrate vm-instance-switch
+kubectl --context tenant get vmim -w
+kubectl --context tenant get vmi vm-instance-switch -o wide
+kubectl --context fraud -n fraud logs deploy/terminals --tail=20</code></pre></div>
+      <div class="expect"><span class="ic">✓</span><p data-en="The migration passes Pending → Scheduling → TargetReady → Succeeded within a minute, and the VM now runs on another node. On the dashboard, terminal errors stay at zero. For a second or two a few authorizations go unanswered while the network settles; terminals do what real terminals do — repeat the request with the same transaction id — and the dashboard counts them as “repeated by the terminal”." data-ko="마이그레이션이 1분 안에 Pending → Scheduling → TargetReady → Succeeded를 거치고, VM은 이제 다른 노드에서 돕니다. 대시보드에서 단말기 오류는 0을 유지합니다. 네트워크가 자리 잡는 1~2초 동안 몇 건의 승인이 무응답이 되지만, 단말기는 실제 단말기처럼 같은 거래 ID로 요청을 반복하고, 대시보드는 이를 “repeated by the terminal”로 셉니다.">The migration passes <code>Pending → Scheduling → TargetReady → Succeeded</code> within a minute, and the VM now runs on another node. On the dashboard, <strong>terminal errors stay at zero</strong>. For a second or two a few authorizations go unanswered while the network settles; terminals do what real terminals do — repeat the request with the same transaction id — and the dashboard counts them as “repeated by the terminal”.</p></div>
+    </div>
+
+    <div class="warnbox"><p><strong data-en="After the workshop: " data-ko="워크숍 이후: ">After the workshop: </strong><span data-en="Your environment stays with you for two weeks — bastion, cluster and dashboards keep working. Change the rules in rules.go, write a new attack, and use the same environment for the certification assignment the host shares at the end of the session." data-ko="환경은 2주 동안 유지됩니다 — 배스천, 클러스터, 대시보드가 계속 작동합니다. rules.go의 규칙을 바꿔 보고, 새 공격을 작성해 보고, 세션 끝에 호스트가 공유하는 인증 과제에도 같은 환경을 사용하세요.">Your environment stays with you for two weeks — bastion, cluster and dashboards keep working. Change the rules in <code>rules.go</code>, write a new attack, and use the same environment for the certification assignment the host shares at the end of the session.</span></p></div>
+  </section>
+
+  <!-- TROUBLESHOOTING -->
+  <section id="trouble">
+    <h2 data-en="If something goes wrong" data-ko="문제가 생기면">If something goes wrong</h2>
+    <p class="secintro" data-en="The failures this workshop expects, and their fixes — straight from the original guide." data-ko="이 워크숍에서 예상되는 문제와 해결법 — 원본 가이드에서 가져왔습니다.">The failures this workshop expects, and their fixes — straight from the original guide.</p>
+    <table class="pieces">
+      <thead><tr><th data-en="Symptom" data-ko="증상">Symptom</th><th data-en="Cause and fix" data-ko="원인과 해결">Cause and fix</th></tr></thead>
+      <tbody>
+        <tr><td data-en="virtctl console shows nothing" data-ko="virtctl console에 아무것도 안 보임">virtctl console shows nothing</td><td data-en="Press Enter — the login prompt is printed only once." data-ko="Enter를 누르세요 — 로그인 프롬프트는 한 번만 출력됩니다.">Press Enter — the login prompt is printed only once.</td></tr>
+        <tr><td data-en="Switch log shows stand-in 100% after Part 2" data-ko="Part 2 이후 스위치 로그에 stand-in 100%">Switch log shows stand-in 100% after Part 2</td><td data-en="Kafka is not ready yet, or the address in /etc/auth-switch/env has a typo. kubectl --context tenant get kafka must show READY True." data-ko="Kafka가 아직 준비되지 않았거나 /etc/auth-switch/env의 주소에 오타가 있습니다. kubectl --context tenant get kafka가 READY True여야 합니다.">Kafka is not ready yet, or the address in <code>/etc/auth-switch/env</code> has a typo. <code>kubectl --context tenant get kafka</code> must show <code>READY True</code>.</td></tr>
+        <tr><td data-en="Dashboard returns 502 or 503" data-ko="대시보드가 502 또는 503 반환">Dashboard returns 502 or 503</td><td data-en="The dashboard pod is not running yet: kubectl --context fraud -n fraud get pods." data-ko="대시보드 파드가 아직 실행 중이 아닙니다: kubectl --context fraud -n fraud get pods.">The dashboard pod is not running yet: <code>kubectl --context fraud -n fraud get pods</code>.</td></tr>
+        <tr><td data-en="No explanations after the Part 2 attack" data-ko="Part 2 공격 후 설명이 안 붙음">No explanations after the Part 2 attack</td><td data-en="The explainer is still loading the model: kubectl --context fraud -n fraud logs deploy/explainer." data-ko="설명기가 아직 모델을 로드 중입니다: kubectl --context fraud -n fraud logs deploy/explainer.">The explainer is still loading the model: <code>kubectl --context fraud -n fraud logs deploy/explainer</code>.</td></tr>
+        <tr><td data-en="forbidden on a command" data-ko="명령에서 forbidden 오류">forbidden on a command</td><td data-en="Wrong context. Catalog services, VMs and PostgreSQL pods live in tenant; the fraud services live in fraud." data-ko="컨텍스트가 틀렸습니다. 카탈로그 서비스·VM·PostgreSQL 파드는 tenant에, 사기 서비스는 fraud에 있습니다.">Wrong context. Catalog services, VMs and PostgreSQL pods live in <code>tenant</code>; the fraud services live in <code>fraud</code>.</td></tr>
+        <tr><td data-en="apply fails with SchemaError … unknown model" data-ko="apply가 SchemaError … unknown model로 실패">apply fails with SchemaError … unknown model</td><td data-en="The client-side check failed, not the cluster. Add --validate=false." data-ko="클러스터가 아니라 클라이언트 쪽 검사가 실패한 것입니다. --validate=false를 추가하세요.">The client-side check failed, not the cluster. Add <code>--validate=false</code>.</td></tr>
+        <tr><td data-en="Git push rejected" data-ko="Git push 거부됨">Git push rejected</td><td data-en="Run git pull --rebase, then push again." data-ko="git pull --rebase를 실행한 뒤 다시 푸시하세요.">Run <code>git pull --rebase</code>, then push again.</td></tr>
+        <tr><td data-en="Flux is not applying a change / YAML error" data-ko="Flux가 변경을 적용하지 않음 / YAML 오류">Flux is not applying a change / YAML error</td><td data-en="kubectl --context tenant get kustomization platform shows the error; fix the file, commit, push." data-ko="kubectl --context tenant get kustomization platform에서 오류를 확인하고, 파일을 고쳐 커밋·푸시하세요."><code>kubectl --context tenant get kustomization platform</code> shows the error; fix the file, commit, push.</td></tr>
+        <tr><td data-en="ClickHouse: Memory limit exceeded" data-ko="ClickHouse: Memory limit exceeded">ClickHouse: Memory limit exceeded</td><td data-en="Use preset t1.medium, not t1.small." data-ko="t1.small이 아니라 프리셋 t1.medium을 사용하세요.">Use preset <code>t1.medium</code>, not <code>t1.small</code>.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p><span data-en="Guide based on the official workshop README by the Cozystack community (Aenix):" data-ko="Cozystack 커뮤니티(Aenix)의 공식 워크숍 README를 바탕으로 만든 가이드입니다:">Guide based on the official workshop README by the Cozystack community (Aenix):</span>
+    <a href="https://github.com/aenix-org/cozystack-workshop/blob/master/fraud/README.md" target="_blank" rel="noopener">github.com/aenix-org/cozystack-workshop · fraud/README.md</a> ·
+    <a href="https://cozystack.io" target="_blank" rel="noopener">cozystack.io</a></p>
+    <p data-en="Found something wrong in the Cozystack documentation? The workshop asks you to open an issue or PR in the cozystack/website repository and say which page you used and what you expected." data-ko="Cozystack 문서에서 잘못된 부분을 찾았나요? 워크숍에서는 cozystack/website 저장소에 이슈나 PR을 열고, 어떤 페이지를 썼고 무엇을 기대했는지 적어 달라고 안내합니다.">Found something wrong in the Cozystack documentation? The workshop asks you to open an issue or PR in the <code>cozystack/website</code> repository and say which page you used and what you expected.</p>
+    <a class="totop" href="#arch" data-en="↑ Back to the diagram" data-ko="↑ 다이어그램으로 돌아가기">↑ Back to the diagram</a>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var root = document.documentElement;
+  var btnEn = document.getElementById('btn-en');
+  var btnKo = document.getElementById('btn-ko');
+  var translatable = document.querySelectorAll('[data-en][data-ko]');
+  // Cache the original English HTML so inline markup (<code>, <strong>) survives toggling.
+  translatable.forEach(function(el){ el.dataset.enHtml = el.innerHTML; });
+  function setLang(lang){
+    root.setAttribute('lang', lang);
+    btnEn.setAttribute('aria-pressed', lang === 'en' ? 'true' : 'false');
+    btnKo.setAttribute('aria-pressed', lang === 'ko' ? 'true' : 'false');
+    document.title = lang === 'ko'
+      ? 'Cozystack 사기 탐지 워크숍 — 단계별 가이드'
+      : 'Cozystack Fraud Detection Workshop — Step-by-Step Guide';
+    translatable.forEach(function(el){
+      if (lang === 'en') { el.innerHTML = el.dataset.enHtml; }
+      else { el.textContent = el.dataset.ko; }
+    });
+  }
+  btnEn.addEventListener('click', function(){ setLang('en'); });
+  btnKo.addEventListener('click', function(){ setLang('ko'); });
+
+  // Copy buttons for code blocks
+  document.querySelectorAll('.codeblock').forEach(function(block){
+    var pre = block.querySelector('pre');
+    if (!pre) return;
+    var btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'copybtn'; btn.textContent = 'Copy';
+    btn.setAttribute('aria-label','Copy code');
+    btn.addEventListener('click', function(){
+      var text = pre.innerText;
+      function done(){ btn.textContent = root.getAttribute('lang') === 'ko' ? '복사됨' : 'Copied'; setTimeout(function(){ btn.textContent='Copy'; }, 1600); }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, done);
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch(e) {}
+        document.body.removeChild(ta); done();
+      }
+    });
+    block.appendChild(btn);
+  });
+})();
+</script>
+</body>
+</html>
